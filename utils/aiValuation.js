@@ -1,97 +1,129 @@
 const fetch = require('node-fetch');
 
-// In-memory cache
+// Cache
 const valuationCache = new Map();
 const CACHE_TTL = 5 * 60 * 1000;
 
-// Knowledge base for realistic valuations
+// Knowledge base with realistic values
 const knowledgeBase = {
-    'bitcoin': { value: 60000, scarcity: 95, utility: 70, sentiment: 80, desc: 'scarce digital asset with high demand' },
-    'btc': { value: 60000, scarcity: 95, utility: 70, sentiment: 80, desc: 'scarce digital asset with high demand' },
-    'tesla': { value: 45000, scarcity: 40, utility: 85, sentiment: 75, desc: 'high-tech electric vehicle' },
-    'car': { value: 30000, scarcity: 30, utility: 90, sentiment: 60, desc: 'essential transportation vehicle' },
-    'rolex': { value: 15000, scarcity: 80, utility: 30, sentiment: 90, desc: 'luxury timepiece with prestige value' },
-    'watch': { value: 5000, scarcity: 60, utility: 40, sentiment: 70, desc: 'personal timekeeping device' },
-    'iphone': { value: 1200, scarcity: 20, utility: 95, sentiment: 80, desc: 'ubiquitous communication device' },
-    'pizza': { value: 15, scarcity: 10, utility: 80, sentiment: 85, desc: 'popular food with universal appeal' },
-    'coffee': { value: 5, scarcity: 5, utility: 70, sentiment: 75, desc: 'daily stimulant beverage' },
-    'hour of coding': { value: 100, scarcity: 40, utility: 90, sentiment: 60, desc: 'skilled technical labor' },
-    'camel': { value: 5000, scarcity: 70, utility: 60, sentiment: 50, desc: 'traditional transport animal' },
-    'yacht': { value: 500000, scarcity: 90, utility: 20, sentiment: 85, desc: 'luxury marine vessel' },
-    'mansion': { value: 2000000, scarcity: 85, utility: 50, sentiment: 80, desc: 'prestigious residential property' },
-    'picasso': { value: 10000000, scarcity: 98, utility: 10, sentiment: 95, desc: 'rare masterpiece artwork' },
-    'painting': { value: 5000, scarcity: 50, utility: 30, sentiment: 70, desc: 'decorative artwork' },
-    'gold': { value: 60000, scarcity: 85, utility: 60, sentiment: 80, desc: 'precious metal store of value' },
-    'diamond': { value: 10000, scarcity: 75, utility: 20, sentiment: 85, desc: 'scarce gemstone with cultural value' },
-    'land': { value: 50000, scarcity: 80, utility: 70, sentiment: 60, desc: 'finite physical territory' },
-    'vintage': { value: 10000, scarcity: 85, utility: 30, sentiment: 80, desc: 'rare collectible item' },
-    'antique': { value: 8000, scarcity: 80, utility: 25, sentiment: 75, desc: 'historical collectible item' }
+    'bitcoin': { value: 65000, type: 'crypto', scarcity: 95, utility: 60, desc: 'digital store of value' },
+    'btc': { value: 65000, type: 'crypto', scarcity: 95, utility: 60, desc: 'scarce cryptocurrency' },
+    'ethereum': { value: 3500, type: 'crypto', scarcity: 85, utility: 80, desc: 'smart contract platform' },
+    'tesla': { value: 45000, type: 'vehicle', scarcity: 40, utility: 85, desc: 'electric vehicle' },
+    'car': { value: 30000, type: 'vehicle', scarcity: 30, utility: 90, desc: 'automobile' },
+    'lamborghini': { value: 250000, type: 'vehicle', scarcity: 90, utility: 30, desc: 'luxury supercar' },
+    'ferrari': { value: 300000, type: 'vehicle', scarcity: 92, utility: 35, desc: 'exotic sports car' },
+    'rolex': { value: 15000, type: 'luxury', scarcity: 80, utility: 25, desc: 'luxury timepiece' },
+    'watch': { value: 3000, type: 'accessory', scarcity: 50, utility: 40, desc: 'wristwatch' },
+    'iphone': { value: 1200, type: 'tech', scarcity: 20, utility: 95, desc: 'smartphone' },
+    'macbook': { value: 2500, type: 'tech', scarcity: 25, utility: 90, desc: 'laptop computer' },
+    'computer': { value: 1500, type: 'tech', scarcity: 20, utility: 90, desc: 'computer' },
+    'pizza': { value: 15, type: 'food', scarcity: 5, utility: 70, desc: 'food' },
+    'coffee': { value: 5, type: 'food', scarcity: 5, utility: 65, desc: 'beverage' },
+    'dinner': { value: 50, type: 'service', scarcity: 10, utility: 75, desc: 'meal' },
+    'hour of coding': { value: 100, type: 'service', scarcity: 40, utility: 90, desc: 'software development' },
+    'hour of labor': { value: 25, type: 'service', scarcity: 30, utility: 80, desc: 'manual labor' },
+    'camel': { value: 5000, type: 'animal', scarcity: 70, utility: 60, desc: 'transport animal' },
+    'horse': { value: 5000, type: 'animal', scarcity: 60, utility: 65, desc: 'riding animal' },
+    'yacht': { value: 500000, type: 'luxury', scarcity: 95, utility: 20, desc: 'marine vessel' },
+    'mansion': { value: 2000000, type: 'property', scarcity: 90, utility: 60, desc: 'luxury home' },
+    'house': { value: 400000, type: 'property', scarcity: 50, utility: 95, desc: 'residence' },
+    'land': { value: 100000, type: 'property', scarcity: 80, utility: 70, desc: 'acre of land' },
+    'picasso': { value: 5000000, type: 'art', scarcity: 98, utility: 10, desc: 'masterpiece artwork' },
+    'painting': { value: 5000, type: 'art', scarcity: 40, utility: 30, desc: 'artwork' },
+    'gold': { value: 60000, type: 'commodity', scarcity: 85, utility: 50, desc: 'precious metal' },
+    'diamond': { value: 10000, type: 'commodity', scarcity: 80, utility: 20, desc: 'gemstone' },
+    'vintage': { value: 8000, type: 'collectible', scarcity: 85, utility: 25, desc: 'vintage item' },
+    'antique': { value: 6000, type: 'collectible', scarcity: 80, utility: 20, desc: 'antique item' },
+    'chair': { value: 150, type: 'furniture', scarcity: 10, utility: 70, desc: 'furniture' },
+    'furniture': { value: 500, type: 'furniture', scarcity: 20, utility: 75, desc: 'household items' },
+    'bike': { value: 800, type: 'vehicle', scarcity: 20, utility: 85, desc: 'bicycle' },
+    'motorcycle': { value: 12000, type: 'vehicle', scarcity: 45, utility: 75, desc: 'motorcycle' },
+    'book': { value: 20, type: 'media', scarcity: 5, utility: 60, desc: 'book' },
+    'plane': { value: 5000000, type: 'vehicle', scarcity: 95, utility: 40, desc: 'aircraft' }
 };
 
-/**
- * Get item data from knowledge base or estimate
- */
 function getItemData(item) {
     const itemLower = item.toLowerCase();
     
-    // Check knowledge base
     for (const [key, data] of Object.entries(knowledgeBase)) {
         if (itemLower.includes(key)) {
-            return data;
+            return { ...data, name: key };
         }
     }
     
-    // Estimate based on keywords
-    if (itemLower.includes('lamborghini') || itemLower.includes('ferrari') || itemLower.includes('bentley')) {
-        return { value: 200000, scarcity: 85, utility: 40, sentiment: 90, desc: 'luxury supercar with prestige' };
+    // Smart defaults based on keywords
+    if (itemLower.includes('crypto') || itemLower.includes('coin')) {
+        return { value: 1000, type: 'crypto', scarcity: 70, utility: 50, name: 'crypto', desc: 'cryptocurrency' };
     }
-    if (itemLower.includes('house') || itemLower.includes('apartment')) {
-        return { value: 300000, scarcity: 60, utility: 95, sentiment: 70, desc: 'essential living space' };
+    if (itemLower.includes('service') || itemLower.includes('hour') || itemLower.includes('work')) {
+        return { value: 50, type: 'service', scarcity: 30, utility: 80, name: 'service', desc: 'professional service' };
     }
-    if (itemLower.includes('bike') || itemLower.includes('bicycle')) {
-        return { value: 500, scarcity: 20, utility: 80, sentiment: 60, desc: 'efficient personal transport' };
+    if (itemLower.includes('art') || itemLower.includes('sculpture') || itemLower.includes('statue')) {
+        return { value: 2000, type: 'art', scarcity: 70, utility: 20, name: 'art', desc: 'art piece' };
     }
-    if (itemLower.includes('laptop') || itemLower.includes('computer')) {
-        return { value: 1500, scarcity: 15, utility: 90, sentiment: 65, desc: 'essential productivity tool' };
-    }
-    if (itemLower.includes('chair') || itemLower.includes('furniture')) {
-        return { value: 200, scarcity: 10, utility: 70, sentiment: 40, desc: 'common household item' };
-    }
-    if (itemLower.includes('book')) {
-        return { value: 20, scarcity: 5, utility: 60, sentiment: 55, desc: 'source of knowledge/entertainment' };
-    }
-    if (itemLower.includes('service') || itemLower.includes('hour')) {
-        return { value: 50, scarcity: 30, utility: 80, sentiment: 50, desc: 'time-based skilled labor' };
+    if (itemLower.includes('jewelry') || itemLower.includes('ring') || itemLower.includes('necklace')) {
+        return { value: 3000, type: 'luxury', scarcity: 75, utility: 20, name: 'jewelry', desc: 'jewelry' };
     }
     
-    // Default estimate
-    return { 
-        value: 100, 
-        scarcity: 40 + Math.floor(Math.random() * 30), 
-        utility: 50 + Math.floor(Math.random() * 30), 
-        sentiment: 45 + Math.floor(Math.random() * 30),
-        desc: 'item with moderate value and utility'
-    };
+    return { value: 100, type: 'item', scarcity: 40, utility: 50, name: 'item', desc: 'item' };
 }
 
-/**
- * Generate AI-style analysis sentence
- */
-function generateAnalysis(haveData, wantData, ratio) {
-    const analyses = [
-        `${haveData.desc} exchanges at ${ratio.toFixed(1)}:1 ratio with ${wantData.desc} based on scarcity differential.`,
-        `Value vectors align: ${haveData.desc} carries ${haveData.scarcity}% scarcity vs ${wantData.desc} at ${wantData.scarcity}%.`,
-        `Multi-dimensional analysis shows optimal exchange considering utility (${haveData.utility}% vs ${wantData.utility}%) and market demand.`,
-        `Neural valuation complete: ${ratio.toFixed(1)} ${wantData.desc.split(' ').pop()} equivalent to 1 ${haveData.desc.split(' ').pop()}.`,
-        `Fair market ratio calculated: scarcity premium (${haveData.scarcity}%) vs functional utility (${wantData.utility}%).`
-    ];
+function generateAnalysis(have, want, amount) {
+    const templates = [];
     
-    return analyses[Math.floor(Math.random() * analyses.length)];
+    // Scarcity-based analysis
+    if (have.scarcity > want.scarcity + 30) {
+        templates.push(`${have.name} (${have.scarcity}% scarcity) commands premium over abundant ${want.name} (${want.scarcity}% scarcity).`);
+    } else if (want.scarcity > have.scarcity + 30) {
+        templates.push(`${want.name}'s ${want.scarcity}% scarcity vs ${have.name}'s ${have.scarcity}% drives ${amount}:1 ratio.`);
+    }
+    
+    // Utility-based analysis
+    if (have.utility > want.utility + 30) {
+        templates.push(`High utility ${have.desc} (${have.utility}%) vs decorative ${want.name} creates ${amount}:1 exchange.`);
+    } else if (want.utility > have.utility + 30) {
+        templates.push(`Essential ${want.desc} (${want.utility}% utility) valued ${amount}x over ${have.desc}.`);
+    }
+    
+    // Value magnitude analysis
+    if (have.value > want.value * 100) {
+        templates.push(`Massive value gap: premium ${have.desc} equals ${amount} units of basic ${want.desc}.`);
+    } else if (have.value > want.value * 10) {
+        templates.push(`Significant valuation: ${have.desc} trades at ${amount}:1 to ${want.desc}.`);
+    } else if (have.value > want.value) {
+        templates.push(`Moderate premium: ${have.desc} worth ${amount}x ${want.desc} based on market factors.`);
+    } else if (have.value < want.value) {
+        templates.push(`${want.desc} scarcity commands premium - ${have.desc} yields only ${amount} units.`);
+    }
+    
+    // Category-based analysis
+    if (have.type === 'crypto' && want.type === 'vehicle') {
+        templates.push(`Digital scarcity (${have.name}) meets physical utility (${want.name}): ${amount}:1 optimal ratio.`);
+    }
+    if (have.type === 'luxury' && want.type === 'tech') {
+        templates.push(`Prestige asset (${have.name}) valued against functional tech (${want.name}) at ${amount}:1.`);
+    }
+    if (have.type === 'service' && want.type === 'food') {
+        templates.push(`${have.desc} converts to ${amount} units of ${want.desc} at fair market rate.`);
+    }
+    if (have.type === 'property' && want.type === 'crypto') {
+        templates.push(`Physical asset (${have.name}) exchanges for ${amount} units of digital store of value.`);
+    }
+    if (have.type === 'art' && want.type === 'luxury') {
+        templates.push(`Cultural value (${have.name}) trades at ${amount}:1 to status symbol (${want.name}).`);
+    }
+    
+    // Generic fallback if no specific template matched
+    if (templates.length === 0) {
+        templates.push(`Multi-factor analysis: ${have.desc} scarcity ${have.scarcity}% vs ${want.desc} utility ${want.utility}% = ${amount}:1.`);
+        templates.push(`Market equilibrium: ${amount} ${want.name} equal ${have.name} based on comparable value.`);
+        templates.push(`Neural valuation: ${have.desc} (${have.value}) / ${want.desc} (${want.value}) = ${amount}:1 ratio.`);
+    }
+    
+    return templates[Math.floor(Math.random() * templates.length)];
 }
 
-/**
- * AI Barter Valuation
- */
 async function getBarterValuation(haveItem, haveAmount, wantItem) {
     const cacheKey = `${haveItem}:${haveAmount}:${wantItem}`;
     
@@ -102,75 +134,47 @@ async function getBarterValuation(haveItem, haveAmount, wantItem) {
         }
     }
 
-    try {
-        // Get item data
-        const haveData = getItemData(haveItem);
-        const wantData = getItemData(wantItem);
-        
-        // Calculate exchange rate
-        const haveTotalValue = haveData.value * haveAmount;
-        const exchangeRate = haveTotalValue / wantData.value;
-        
-        // Calculate weighted confidence
-        const confidence = Math.round(
-            (haveData.scarcity * 0.4) + 
-            (wantData.scarcity * 0.4) + 
-            (Math.min(haveData.utility, wantData.utility) * 0.2)
-        );
-        
-        // Calculate fairness
-        const valueRatio = haveData.value / wantData.value;
-        const fairness = Math.min(100, Math.round(100 - (Math.abs(valueRatio - 1) * 20)));
-        
-        const result = {
-            amount: Math.max(0.01, Math.round(exchangeRate * 100) / 100),
-            confidence: Math.min(100, Math.max(60, confidence)),
-            fairness: Math.min(100, Math.max(40, fairness)),
-            analysis: generateAnalysis(haveData, wantData, exchangeRate),
-            factors: {
-                utility: Math.round((haveData.utility + wantData.utility) / 2),
-                scarcity: Math.round((haveData.scarcity + wantData.scarcity) / 2),
-                sentiment: Math.round((haveData.sentiment + wantData.sentiment) / 2)
-            }
-        };
-        
-        result.images = {
-            have: generateItemImage(haveItem),
-            want: generateItemImage(wantItem)
-        };
-        
-        valuationCache.set(cacheKey, {
-            data: result,
-            timestamp: Date.now()
-        });
-        
-        return result;
-        
-    } catch (error) {
-        console.error('Valuation error:', error);
-        // Ultimate fallback
-        return {
-            amount: 1,
-            confidence: 60,
-            fairness: 50,
-            analysis: 'AI valuation: Exchange rate estimated based on comparable asset values.',
-            factors: { utility: 50, scarcity: 50, sentiment: 50 },
-            images: {
-                have: generateItemImage(haveItem),
-                want: generateItemImage(wantItem)
-            }
-        };
-    }
+    const have = getItemData(haveItem);
+    const want = getItemData(wantItem);
+    
+    const haveTotalValue = have.value * haveAmount;
+    const exchangeRate = Math.max(0.01, haveTotalValue / want.value);
+    
+    // Weighted confidence based on data quality
+    const confidence = Math.round(
+        (have.scarcity * 0.3) + 
+        (want.scarcity * 0.3) + 
+        (Math.min(have.utility, want.utility) * 0.2) +
+        (have.value > 1000 ? 20 : 0)
+    );
+    
+    // Fairness based on value ratio proximity to 1:1
+    const ratio = have.value / want.value;
+    const fairness = Math.min(100, Math.round(100 - Math.abs(Math.log(ratio)) * 20));
+    
+    const result = {
+        amount: Math.round(exchangeRate * 100) / 100,
+        confidence: Math.min(95, Math.max(65, confidence)),
+        fairness: Math.min(95, Math.max(40, fairness)),
+        analysis: generateAnalysis(have, want, exchangeRate.toFixed(1)),
+        factors: {
+            utility: Math.round((have.utility + want.utility) / 2),
+            scarcity: Math.round((have.scarcity + want.scarcity) / 2),
+            sentiment: Math.round(50 + (have.scarcity - want.scarcity) / 4)
+        },
+        images: {
+            have: `https://image.pollinations.ai/prompt/${encodeURIComponent(haveItem)}?width=512&height=512&nologo=true`,
+            want: `https://image.pollinations.ai/prompt/${encodeURIComponent(wantItem)}?width=512&height=512&nologo=true`
+        }
+    };
+    
+    valuationCache.set(cacheKey, { data: result, timestamp: Date.now() });
+    
+    return result;
 }
 
-/**
- * Generate image URL
- */
 function generateItemImage(itemName) {
-    const prompt = encodeURIComponent(
-        `High quality product photo of ${itemName}, cyberpunk aesthetic, neon lighting, dark background, professional photography, detailed, 8k quality`
-    );
-    return `https://image.pollinations.ai/prompt/${prompt}?width=512&height=512&seed=${Math.floor(Math.random() * 10000)}&nologo=true`;
+    return `https://image.pollinations.ai/prompt/${encodeURIComponent(itemName)}?width=512&height=512&nologo=true`;
 }
 
 module.exports = {
