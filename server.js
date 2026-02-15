@@ -113,6 +113,11 @@ app.use('/api/auth', authRoutes);
 app.use('/api/barters', barterRoutes);
 app.use('/api/users', userRoutes);
 
+// Serve AI Calculator as default
+app.get('/ai-calculator.html', (req, res) => {
+    res.sendFile(path.join(__dirname, 'public', 'ai-calculator.html'));
+});
+
 // AI Valuation endpoint
 app.post('/api/valuate', async (req, res) => {
     try {
