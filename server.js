@@ -86,26 +86,23 @@ let dbInitialized = false;
 
 async function initDatabase() {
     try {
-        await mongoose.connect(MONGODB_URI);
+        // Try MongoDB first (with short timeout)
+        await Promise.race([
+            mongoose.connect(MONGODB_URI),
+            new Promise((_, reject) => setTimeout(() => reject(new Error('MongoDB timeout')), 5000))
+        ]);
         console.log('✓ MongoDB connected');
         dbType = 'mongodb';
         dbInitialized = true;
     } catch (err) {
-        console.error('✗ MongoDB connection error:', err.message);
-        console.log('  Falling back to file-based database...');
+        console.log('MongoDB not available, using file DB:', err.message);
         
-        // Initialize file-based database
-        try {
-            const fileDB = require('./utils/fileDB');
-            await fileDB.init();
-            dbType = 'file';
-            dbInitialized = true;
-            console.log('✓ File-based database active');
-        } catch (fileErr) {
-            console.error('✗ File DB error:', fileErr.message);
-            dbType = 'none';
-            dbInitialized = true;
-        }
+        // Initialize file-based database (always works)
+        const fileDB = require('./utils/fileDB');
+        await fileDB.init();
+        dbType = 'file';
+        dbInitialized = true;
+        console.log('✓ File database active');
     }
 }
 

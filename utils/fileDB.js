@@ -4,29 +4,55 @@ const path = require('path');
 const fs = require('fs');
 
 // Use /tmp for Render (ephemeral filesystem) or local data directory
-const dataDir = process.env.RENDER ? '/tmp/data' : path.join(__dirname, '../data');
-
-// Ensure data directory exists
-try {
-  if (!fs.existsSync(dataDir)) {
-    fs.mkdirSync(dataDir, { recursive: true });
-  }
-} catch (err) {
-  console.error('Failed to create data directory:', err.message);
-  // Fallback to /tmp
+function getDataDir() {
+  // Try /tmp first for Render
   const tmpDir = '/tmp/data';
-  if (!fs.existsSync(tmpDir)) {
-    fs.mkdirSync(tmpDir, { recursive: true });
+  try {
+    if (!fs.existsSync(tmpDir)) {
+      fs.mkdirSync(tmpDir, { recursive: true });
+    }
+    // Test if we can write
+    fs.writeFileSync(path.join(tmpDir, '.test'), 'test');
+    fs.unlinkSync(path.join(tmpDir, '.test'));
+    return tmpDir;
+  } catch (err) {
+    console.log('/tmp not writable, trying local data dir');
+  }
+  
+  // Fallback to local data directory
+  const localDir = path.join(__dirname, '../data');
+  try {
+    if (!fs.existsSync(localDir)) {
+      fs.mkdirSync(localDir, { recursive: true });
+    }
+    return localDir;
+  } catch (err) {
+    console.log('Local data dir failed, using memory only');
+    return null;
   }
 }
 
-// Use file-based database as fallback when MongoDB is not available
-const adapter = new JSONFile(path.join(dataDir, 'db.json'));
-const db = new Low(adapter, {
-  users: [],
-  barters: [],
-  trades: []
-});
+const dataDir = getDataDir();
+let adapter;
+let db;
+
+if (dataDir) {
+  adapter = new JSONFile(path.join(dataDir, 'db.json'));
+  db = new Low(adapter, {
+    users: [],
+    barters: [],
+    trades: []
+  });
+} else {
+  // In-memory fallback
+  console.log('Using in-memory database (data will be lost on restart)');
+  const memoryData = { users: [], barters: [], trades: [] };
+  db = {
+    data: memoryData,
+    read: async () => {},
+    write: async () => {}
+  };
+}
 
 async function init() {
   try {
@@ -35,10 +61,15 @@ async function init() {
       db.data = { users: [], barters: [], trades: [] };
     }
     await db.write();
+    console.log('✓ FileDB initialized at:', dataDir || 'memory');
     return true;
   } catch (err) {
     console.error('FileDB init error:', err.message);
-    throw err;
+    // Use memory as fallback
+    db.data = { users: [], barters: [], trades: [] };
+    db.read = async () => {};
+    db.write = async () => {};
+    return true;
   }
 }
 
@@ -69,6 +100,11 @@ const users = {
   async findById(id) {
     await db.read();
     return db.data.users.find(u => u._id === id);
+  },
+  
+  async find() {
+    await db.read();
+    return db.data.users;
   }
 };
 
