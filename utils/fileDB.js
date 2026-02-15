@@ -3,10 +3,21 @@ const { JSONFile } = require('lowdb/node');
 const path = require('path');
 const fs = require('fs');
 
+// Use /tmp for Render (ephemeral filesystem) or local data directory
+const dataDir = process.env.RENDER ? '/tmp/data' : path.join(__dirname, '../data');
+
 // Ensure data directory exists
-const dataDir = path.join(__dirname, '../data');
-if (!fs.existsSync(dataDir)) {
-  fs.mkdirSync(dataDir, { recursive: true });
+try {
+  if (!fs.existsSync(dataDir)) {
+    fs.mkdirSync(dataDir, { recursive: true });
+  }
+} catch (err) {
+  console.error('Failed to create data directory:', err.message);
+  // Fallback to /tmp
+  const tmpDir = '/tmp/data';
+  if (!fs.existsSync(tmpDir)) {
+    fs.mkdirSync(tmpDir, { recursive: true });
+  }
 }
 
 // Use file-based database as fallback when MongoDB is not available

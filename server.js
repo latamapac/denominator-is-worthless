@@ -41,6 +41,11 @@ app.set('io', io);
 const PORT = process.env.PORT || 3000;
 const MONGODB_URI = process.env.MONGODB_URI || 'mongodb://localhost:27017/denominator';
 
+// Detect if running on Render
+if (process.env.RENDER_SERVICE_ID) {
+    process.env.RENDER = 'true';
+}
+
 // Security middleware
 app.use(helmet({
     contentSecurityPolicy: {
