@@ -51,8 +51,8 @@ async function fetchCryptoPrice(itemName) {
     
     if (!coinId) return null;
     
+    // Try CoinGecko first
     try {
-        // CoinGecko free API - no key needed!
         const controller = new AbortController();
         const timeout = setTimeout(() => controller.abort(), 5000);
         
@@ -62,18 +62,47 @@ async function fetchCryptoPrice(itemName) {
         );
         clearTimeout(timeout);
         
-        if (!response.ok) throw new Error('CoinGecko API failed');
-        
-        const data = await response.json();
-        const price = data[coinId]?.usd;
-        
-        if (price) {
-            priceCache.set(lower, { price, timestamp: Date.now() });
-            console.log(`[Real Price] ${itemName}: $${price}`);
-            return price;
+        if (response.ok) {
+            const data = await response.json();
+            const price = data[coinId]?.usd;
+            if (price) {
+                priceCache.set(lower, { price, timestamp: Date.now() });
+                console.log(`[CoinGecko] ${itemName}: $${price}`);
+                return price;
+            }
         }
     } catch (error) {
-        console.log(`CoinGecko error for ${itemName}:`, error.message);
+        console.log(`CoinGecko failed for ${itemName}: ${error.message}`);
+    }
+    
+    // Fallback: Try CoinCap API (also free, no key)
+    try {
+        const symbol = coinId === 'bitcoin' ? 'bitcoin' : 
+                      coinId === 'ethereum' ? 'ethereum' :
+                      coinId === 'solana' ? 'solana' : null;
+        
+        if (symbol) {
+            const controller = new AbortController();
+            const timeout = setTimeout(() => controller.abort(), 5000);
+            
+            const response = await fetch(
+                `https://api.coincap.io/v2/assets/${symbol}`,
+                { signal: controller.signal }
+            );
+            clearTimeout(timeout);
+            
+            if (response.ok) {
+                const data = await response.json();
+                const price = parseFloat(data.data?.priceUsd);
+                if (price) {
+                    priceCache.set(lower, { price, timestamp: Date.now() });
+                    console.log(`[CoinCap] ${itemName}: $${price}`);
+                    return price;
+                }
+            }
+        }
+    } catch (error) {
+        console.log(`CoinCap failed for ${itemName}: ${error.message}`);
     }
     
     return null;
