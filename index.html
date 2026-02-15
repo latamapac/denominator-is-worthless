@@ -1,0 +1,404 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>∅ DENOMINATOR IS WORTHLESS | AI-Powered Barter Platform</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Orbitron:wght@400;700;900&family=Rajdhani:wght@300;400;500;700&family=Share+Tech+Mono&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="styles.css">
+</head>
+<body>
+    <!-- Background Canvas -->
+    <canvas id="bgCanvas"></canvas>
+    
+    <!-- Effects Overlays -->
+    <div class="scanlines"></div>
+    <div class="vignette"></div>
+    <div class="glow-overlay"></div>
+
+    <!-- Notification Area -->
+    <div id="notificationArea" class="notification-area"></div>
+
+    <!-- Header -->
+    <header class="main-header">
+        <div class="header-left">
+            <div class="logo">
+                <span class="logo-symbol">∅</span>
+                <div class="logo-text">
+                    <span class="glitch-text" data-text="DENOMINATOR">DENOMINATOR</span>
+                    <span class="sub-text">IS WORTHLESS</span>
+                </div>
+            </div>
+        </div>
+
+        <nav class="header-nav">
+            <a href="#feed" class="nav-link active">Feed</a>
+            <a href="#market" class="nav-link">Market</a>
+            <a href="#leaderboard" class="nav-link">Leaderboard</a>
+            <a href="#about" class="nav-link">Manifesto</a>
+        </nav>
+
+        <div class="header-right">
+            <button id="createBarterBtn" class="btn-primary" style="display: none;">
+                <span class="icon">+</span>
+                <span>New Barter</span>
+            </button>
+
+            <button id="loginBtn" class="btn-secondary">
+                Connect Wallet / Login
+            </button>
+
+            <div id="userMenu" class="user-menu" style="display: none;">
+                <div class="user-info">
+                    <span class="user-stats">
+                        <span class="stat" title="Total Barters">
+                            <span class="icon">⚡</span>
+                            <span id="userBarters">0</span>
+                        </span>
+                        <span class="stat" title="Reputation">
+                            <span class="icon">★</span>
+                            <span id="userRep">100</span>
+                        </span>
+                    </span>
+                    <span id="username" class="username">User</span>
+                    <div class="user-avatar">
+                        <span id="userAvatar">U</span>
+                    </div>
+                </div>
+                <div id="userDropdown" class="user-dropdown">
+                    <a href="#profile">My Profile</a>
+                    <a href="#inventory">Inventory</a>
+                    <a href="#history">Trade History</a>
+                    <hr>
+                    <a href="#" id="logoutBtn" class="logout">Logout</a>
+                </div>
+            </div>
+        </div>
+    </header>
+
+    <!-- Main Content -->
+    <main class="main-content">
+        <!-- Left Sidebar -->
+        <aside class="sidebar left">
+            <!-- Global Stats -->
+            <div class="panel stats-panel">
+                <h3 class="panel-title">
+                    <span class="icon">◈</span>
+                    Network Stats
+                </h3>
+                <div class="stats-grid">
+                    <div class="stat-card">
+                        <span class="stat-value" id="totalBarters">2,847,291</span>
+                        <span class="stat-label">Total Barters</span>
+                    </div>
+                    <div class="stat-card">
+                        <span class="stat-value" id="totalTrades">1,458,320</span>
+                        <span class="stat-label">Completed Trades</span>
+                    </div>
+                    <div class="stat-card">
+                        <span class="stat-value" id="totalUsers">45,291</span>
+                        <span class="stat-label">Active Traders</span>
+                    </div>
+                    <div class="stat-card highlight">
+                        <span class="stat-value" id="activeBarters">3,421</span>
+                        <span class="stat-label">Live Now</span>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Denominator Status -->
+            <div class="panel denominator-panel">
+                <h3 class="panel-title">
+                    <span class="icon">⚠</span>
+                    Denominator Status
+                </h3>
+                <div class="denominator-meter">
+                    <div class="meter-label">
+                        <span>Relevance</span>
+                        <span class="value">3%</span>
+                    </div>
+                    <div class="meter-bar">
+                        <div class="meter-fill" style="width: 3%"></div>
+                    </div>
+                    <p class="meter-description">
+                        Money was created as a universal placeholder. AI makes it obsolete.
+                    </p>
+                </div>
+            </div>
+
+            <!-- Manifesto -->
+            <div class="panel manifesto-panel">
+                <h3 class="panel-title">
+                    <span class="icon">📜</span>
+                    The Revolution
+                </h3>
+                <div class="manifesto-text">
+                    <p class="highlight">
+                        Money was invented as a <span class="strike">universal denominator</span>.
+                    </p>
+                    <p>A placeholder for value. A middleman between desire and fulfillment.</p>
+                    <p class="highlight">AI changes everything.</p>
+                    <p>Why reduce value to numbers when intelligence can understand worth directly?</p>
+                    <div class="quote">
+                        "1 camel caravan = 847 bar chairs = 3.2 hours of concert piano"
+                    </div>
+                    <p>No conversion rates. No exchange fees. No artificial scarcity.</p>
+                    <p class="final">Just pure value. Finally.</p>
+                </div>
+            </div>
+        </aside>
+
+        <!-- Center Feed -->
+        <section class="feed-section">
+            <div class="feed-header">
+                <h2>
+                    <span class="pulse">◉</span>
+                    Live Barter Feed
+                </h2>
+                <div class="feed-filters">
+                    <button class="filter-btn active">All</button>
+                    <button class="filter-btn">Fair Only</button>
+                    <button class="filter-btn">High Value</button>
+                </div>
+            </div>
+
+            <div id="barterFeed" class="barter-feed">
+                <!-- Barter cards will be inserted here -->
+                <div class="loading-state">
+                    <div class="spinner"></div>
+                    <p>Loading barter feed...</p>
+                </div>
+            </div>
+
+            <button class="load-more">Load More</button>
+        </section>
+
+        <!-- Right Sidebar -->
+        <aside class="sidebar right">
+            <!-- Leaderboard -->
+            <div class="panel leaderboard-panel">
+                <h3 class="panel-title">
+                    <span class="icon">🏆</span>
+                    Top Traders
+                </h3>
+                <div id="leaderboard" class="leaderboard-list">
+                    <div class="loading-spinner"></div>
+                </div>
+                <a href="#full-leaderboard" class="view-all">View Full Leaderboard →</a>
+            </div>
+
+            <!-- Trending -->
+            <div class="panel trending-panel">
+                <h3 class="panel-title">
+                    <span class="icon">📈</span>
+                    Trending Items
+                </h3>
+                <div class="trending-list">
+                    <div class="trending-item">
+                        <span class="trend-icon">🎨</span>
+                        <div class="trend-info">
+                            <span class="trend-name">Vintage Art</span>
+                            <span class="trend-change up">+234%</span>
+                        </div>
+                    </div>
+                    <div class="trending-item">
+                        <span class="trend-icon">🏠</span>
+                        <div class="trend-info">
+                            <span class="trend-name">Real Estate</span>
+                            <span class="trend-change up">+189%</span>
+                        </div>
+                    </div>
+                    <div class="trending-item">
+                        <span class="trend-icon">📚</span>
+                        <div class="trend-info">
+                            <span class="trend-name">Knowledge</span>
+                            <span class="trend-change up">+156%</span>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- AI Models -->
+            <div class="panel models-panel">
+                <h3 class="panel-title">
+                    <span class="icon">🧠</span>
+                    AI Engine
+                </h3>
+                <div class="model-status">
+                    <div class="model-item">
+                        <span class="model-name">Text Valuation</span>
+                        <span class="model-provider">OpenRouter</span>
+                        <span class="status online">●</span>
+                    </div>
+                    <div class="model-item">
+                        <span class="model-name">Image Generation</span>
+                        <span class="model-provider">Pollinations</span>
+                        <span class="status online">●</span>
+                    </div>
+                </div>
+            </div>
+        </aside>
+    </main>
+
+    <!-- Footer -->
+    <footer class="main-footer">
+        <div class="footer-left">
+            <span class="tagline">NO MONEY. NO PROBLEM.</span>
+        </div>
+        <div class="footer-center">
+            <span class="pulse-dot"></span>
+            <span>SYSTEM OPERATIONAL</span>
+            <span class="version">v3.0.0</span>
+        </div>
+        <div class="footer-right">
+            <a href="#docs">API Docs</a>
+            <a href="#github">GitHub</a>
+            <a href="#discord">Discord</a>
+        </div>
+    </footer>
+
+    <!-- Auth Modal -->
+    <div id="authModal" class="modal auth-modal">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h2>
+                    <span class="glitch-text" data-text="ENTER">ENTER</span>
+                    <span>THE SYSTEM</span>
+                </h2>
+                <button class="close-btn" onclick="closeAuthModal()">×</button>
+            </div>
+
+            <div class="auth-tabs">
+                <button class="auth-tab active" data-tab="login">Login</button>
+                <button class="auth-tab" data-tab="register">Join Revolution</button>
+            </div>
+
+            <form id="loginForm" class="auth-form active">
+                <div class="form-group">
+                    <label>Username or Email</label>
+                    <input type="text" name="username" placeholder="trader_001" required>
+                </div>
+                <div class="form-group">
+                    <label>Password</label>
+                    <input type="password" name="password" placeholder="••••••••" required>
+                </div>
+                <button type="submit" class="btn-primary btn-full">
+                    <span>Access Barter Engine</span>
+                </button>
+                <p class="form-note">
+                    No wallet required. No KYC. Just value exchange.
+                </p>
+            </form>
+
+            <form id="registerForm" class="auth-form">
+                <div class="form-group">
+                    <label>Username</label>
+                    <input type="text" name="username" placeholder="choose_unique_handle" required
+                           pattern="[a-zA-Z0-9_]{3,30}" title="3-30 characters, letters, numbers, underscores">
+                </div>
+                <div class="form-group">
+                    <label>Email</label>
+                    <input type="email" name="email" placeholder="you@example.com" required>
+                </div>
+                <div class="form-group">
+                    <label>Password</label>
+                    <input type="password" name="password" placeholder="min_6_characters" required minlength="6">
+                </div>
+                <div class="form-group">
+                    <label>Confirm Password</label>
+                    <input type="password" name="confirmPassword" placeholder="repeat_password" required>
+                </div>
+                <button type="submit" class="btn-primary btn-full">
+                    <span>Create Account</span>
+                </button>
+                <p class="form-note">
+                    By joining, you acknowledge that denominators are worthless.
+                </p>
+            </form>
+        </div>
+    </div>
+
+    <!-- Create Barter Modal -->
+    <div id="barterModal" class="modal barter-modal">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h2>
+                    <span class="icon">⚡</span>
+                    <span>NEW BARTER</span>
+                </h2>
+                <button id="closeBarterModal" class="close-btn">×</button>
+            </div>
+
+            <div class="barter-creator">
+                <div class="exchange-inputs">
+                    <!-- Have Side -->
+                    <div class="input-side have-side">
+                        <label class="side-label">
+                            <span class="label-icon">▼</span>
+                            YOU HAVE
+                        </label>
+                        <div class="input-group">
+                            <input type="number" id="haveAmount" value="1" min="0.01" step="0.01" class="amount-input">
+                            <input type="text" id="haveInput" placeholder="e.g., vintage motorcycle" class="item-input">
+                        </div>
+                        <div class="input-hints">
+                            <span class="hint">Examples: gold coin, Tesla Model 3, 3 hours coding</span>
+                        </div>
+                    </div>
+
+                    <!-- Center -->
+                    <div class="exchange-center">
+                        <div class="ai-core" id="aiCore">
+                            <div class="core-rings">
+                                <div class="ring ring-1"></div>
+                                <div class="ring ring-2"></div>
+                                <div class="ring ring-3"></div>
+                            </div>
+                            <div class="core-text">AI</div>
+                        </div>
+                        <div class="exchange-arrow">⇄</div>
+                    </div>
+
+                    <!-- Want Side -->
+                    <div class="input-side want-side">
+                        <label class="side-label">
+                            <span class="label-icon">▲</span>
+                            YOU WANT
+                        </label>
+                        <div class="input-group">
+                            <input type="number" id="wantAmount" placeholder="?" readonly class="amount-input result">
+                            <input type="text" id="wantInput" placeholder="e.g., bar chairs" class="item-input">
+                        </div>
+                        <div class="input-hints">
+                            <span class="hint">AI will calculate fair exchange</span>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- AI Analysis Panel -->
+                <div id="resultPanel" class="analysis-panel">
+                    <div class="analysis-header">
+                        <span class="ai-icon">🧠</span>
+                        <span>AI VALUE ANALYSIS</span>
+                        <span id="aiConfidence" class="confidence-badge">--</span>
+                    </div>
+                    <div id="calculationStatus" class="calculation-status">
+                        Enter items to calculate exchange rate
+                    </div>
+                </div>
+
+                <button id="submitBarter" class="btn-primary btn-full btn-large">
+                    <span class="btn-text">INITIATE BARTER</span>
+                    <span class="btn-glow"></span>
+                </button>
+            </div>
+        </div>
+    </div>
+
+    <!-- Socket.IO -->
+    <script src="https://cdn.socket.io/4.7.2/socket.io.min.js"></script>
+    <script src="app.js"></script>
+</body>
+</html>
