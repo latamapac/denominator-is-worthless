@@ -82,13 +82,15 @@ app.use('/api/auth/register', authLimiter);
 
 // Database connection
 let dbType = 'none';
+let dbInitialized = false;
 
-mongoose.connect(MONGODB_URI)
-    .then(() => {
+async function initDatabase() {
+    try {
+        await mongoose.connect(MONGODB_URI);
         console.log('✓ MongoDB connected');
         dbType = 'mongodb';
-    })
-    .catch(async err => {
+        dbInitialized = true;
+    } catch (err) {
         console.error('✗ MongoDB connection error:', err.message);
         console.log('  Falling back to file-based database...');
         
@@ -97,12 +99,17 @@ mongoose.connect(MONGODB_URI)
             const fileDB = require('./utils/fileDB');
             await fileDB.init();
             dbType = 'file';
+            dbInitialized = true;
             console.log('✓ File-based database active');
         } catch (fileErr) {
             console.error('✗ File DB error:', fileErr.message);
             dbType = 'none';
+            dbInitialized = true;
         }
-    });
+    }
+}
+
+initDatabase();
 
 // Routes
 app.use('/api/auth', authRoutes);
@@ -155,6 +162,22 @@ app.get('/api/image/:item', async (req, res) => {
 
 // Health check
 app.get('/api/health', async (req, res) => {
+    // Wait for DB init if not done yet
+    if (!dbInitialized) {
+        await new Promise(resolve => {
+            const check = setInterval(() => {
+                if (dbInitialized) {
+                    clearInterval(check);
+                    resolve();
+                }
+            }, 100);
+            setTimeout(() => {
+                clearInterval(check);
+                resolve();
+            }, 2000);
+        });
+    }
+    
     const isMongoConnected = mongoose.connection.readyState === 1;
     const dbStatus = isMongoConnected ? 'connected' : dbType;
     
