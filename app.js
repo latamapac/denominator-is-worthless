@@ -341,10 +341,30 @@ async function loadFeed() {
 
         if (data.success) {
             elements.feed.innerHTML = '';
-            data.barters.forEach(barter => addBarterToFeed(barter));
+            
+            if (data.barters.length === 0) {
+                // Show empty state
+                elements.feed.innerHTML = `
+                    <div class="empty-state">
+                        <div class="empty-icon">📭</div>
+                        <h3>No active barters</h3>
+                        <p>Be the first to create a barter offer!</p>
+                        <button class="btn-primary" onclick="openBarterModal()">
+                            Create Barter
+                        </button>
+                    </div>
+                `;
+            } else {
+                data.barters.forEach(barter => addBarterToFeed(barter));
+            }
         }
     } catch (error) {
         console.error('Feed load error:', error);
+        elements.feed.innerHTML = `
+            <div class="error-state">
+                <p>Failed to load feed. Please refresh.</p>
+            </div>
+        `;
     }
 }
 

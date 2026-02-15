@@ -843,6 +843,38 @@ body {
     color: var(--text-muted);
 }
 
+/* Empty State */
+.empty-state {
+    text-align: center;
+    padding: 60px 40px;
+    color: var(--text-secondary);
+}
+
+.empty-state .empty-icon {
+    font-size: 4rem;
+    margin-bottom: 20px;
+    opacity: 0.5;
+}
+
+.empty-state h3 {
+    font-family: 'Orbitron', sans-serif;
+    font-size: 1.2rem;
+    color: var(--text-primary);
+    margin-bottom: 10px;
+}
+
+.empty-state p {
+    margin-bottom: 25px;
+    color: var(--text-muted);
+}
+
+/* Error State */
+.error-state {
+    text-align: center;
+    padding: 40px;
+    color: var(--error);
+}
+
 .spinner {
     width: 40px;
     height: 40px;
