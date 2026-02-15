@@ -62,6 +62,7 @@ app.use(helmet({
 app.use(cors());
 app.use(express.json({ limit: '10mb' }));
 app.use(express.static('.'));
+app.use('/public', express.static(path.join(__dirname, 'public')));
 
 // Rate limiting
 const limiter = rateLimit({
@@ -278,8 +279,12 @@ io.on('connection', (socket) => {
     });
 });
 
-// Main app route
+// Main app route - redirect to AI calculator for viral effect
 app.get('/', (req, res) => {
+    res.sendFile(path.join(__dirname, 'public', 'ai-calculator.html'));
+});
+
+app.get('/app', (req, res) => {
     res.sendFile(path.join(__dirname, 'index.html'));
 });
 
