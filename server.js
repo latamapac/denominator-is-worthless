@@ -70,6 +70,7 @@ app.get('/', (req, res) => {
 // Static files
 app.use(express.static('.', { index: false }));
 app.use('/public', express.static(path.join(__dirname, 'public')));
+app.use(express.static(path.join(__dirname, 'public'), { index: false }));
 
 // Rate limiting
 const limiter = rateLimit({
