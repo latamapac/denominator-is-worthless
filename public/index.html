@@ -382,16 +382,19 @@
             const haveAmount = parseFloat(document.getElementById('haveAmount').value) || 1;
 
             if (!haveItem || !wantItem) {
-                alert('Please enter both items');
                 return;
             }
 
             console.log('Calculating:', haveItem, '->', wantItem);
             
-            document.getElementById('calculating').classList.add('show');
-            document.getElementById('resultPanel').classList.remove('show');
-            document.getElementById('calculateBtn').disabled = true;
-            document.getElementById('calculateBtn').textContent = '🧠 Calculating...';
+            const calculatingEl = document.getElementById('calculating');
+            const resultPanelEl = document.getElementById('resultPanel');
+            const calcBtn = document.getElementById('calculateBtn');
+            
+            calculatingEl.style.display = 'block';
+            resultPanelEl.style.display = 'none';
+            calcBtn.disabled = true;
+            calcBtn.textContent = '🧠 Calculating...';
 
             try {
                 console.log('Fetching from:', `${API_URL}/api/valuate`);
@@ -408,29 +411,33 @@
                 if (data.success) {
                     displayResult(data);
                 } else {
-                    alert('Error: ' + (data.error || 'Unknown error'));
+                    console.error('API Error:', data.error);
                 }
             } catch (error) {
-                console.error('Error:', error);
-                alert('Failed to calculate. Check console for details.');
+                console.error('Fetch Error:', error);
             } finally {
-                document.getElementById('calculating').classList.remove('show');
-                document.getElementById('calculateBtn').disabled = false;
-                document.getElementById('calculateBtn').textContent = '⚡ CALCULATE EXCHANGE';
+                calculatingEl.style.display = 'none';
+                calcBtn.disabled = false;
+                calcBtn.textContent = '⚡ CALCULATE EXCHANGE';
             }
         }
 
         function displayResult(data) {
-            document.getElementById('resultAmount').textContent = 
-                Number.isInteger(data.amount) ? data.amount : data.amount.toFixed(1);
+            console.log('Displaying result:', data);
+            
+            const amount = Number.isInteger(data.amount) ? data.amount : data.amount.toFixed(1);
+            
+            document.getElementById('resultAmount').textContent = amount;
             document.getElementById('resultItem').textContent = data.wantItem;
-            document.getElementById('wantAmount').value = 
-                Number.isInteger(data.amount) ? data.amount : data.amount.toFixed(1);
+            document.getElementById('wantAmount').value = amount;
             document.getElementById('analysisText').textContent = data.analysis;
             document.getElementById('utilityValue').textContent = `${data.factors.utility}%`;
             document.getElementById('scarcityValue').textContent = `${data.factors.scarcity}%`;
             document.getElementById('sentimentValue').textContent = `${data.factors.sentiment}%`;
-            document.getElementById('resultPanel').classList.add('show');
+            
+            const resultPanel = document.getElementById('resultPanel');
+            resultPanel.style.display = 'block';
+            console.log('Result panel displayed');
         }
 
         function setExample(have, want) {
