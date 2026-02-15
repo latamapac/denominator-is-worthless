@@ -1,0 +1,100 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <meta charset="UTF-8">
+    <title>Simple AI Calculator Test</title>
+    <style>
+        body { 
+            font-family: system-ui, sans-serif; 
+            max-width: 600px; 
+            margin: 50px auto; 
+            padding: 20px;
+            background: #111;
+            color: #fff;
+        }
+        input, button {
+            width: 100%;
+            padding: 15px;
+            margin: 10px 0;
+            font-size: 18px;
+            border-radius: 8px;
+            border: 1px solid #333;
+            background: #222;
+            color: #fff;
+        }
+        button {
+            background: linear-gradient(90deg, #00f0ff, #ff006e);
+            border: none;
+            cursor: pointer;
+            font-weight: bold;
+        }
+        #result {
+            margin-top: 30px;
+            padding: 20px;
+            background: #1a1a1a;
+            border-radius: 12px;
+            display: none;
+        }
+        #result.show { display: block; }
+        .amount { font-size: 48px; color: #00f0ff; }
+        .loading { color: #00f0ff; text-align: center; }
+    </style>
+</head>
+<body>
+    <h1>🧠 AI Barter Calculator (Simple Test)</h1>
+    
+    <input type="text" id="have" placeholder="You have (e.g., 1 Bitcoin)" value="1 Bitcoin">
+    <input type="text" id="want" placeholder="You want (e.g., Tesla)" value="Tesla Model 3">
+    <button onclick="calculate()">⚡ CALCULATE</button>
+    
+    <div id="loading" class="loading" style="display:none;">Calculating...</div>
+    
+    <div id="result">
+        <div class="amount" id="amount">0</div>
+        <div id="item"></div>
+        <p id="analysis" style="color:#888; margin-top:15px;"></p>
+    </div>
+
+    <script>
+        async function calculate() {
+            const have = document.getElementById('have').value;
+            const want = document.getElementById('want').value;
+            
+            if (!have || !want) {
+                alert('Enter both items');
+                return;
+            }
+            
+            document.getElementById('loading').style.display = 'block';
+            document.getElementById('result').classList.remove('show');
+            
+            try {
+                const response = await fetch('/api/valuate', {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({ haveItem: have, haveAmount: 1, wantItem: want })
+                });
+                
+                const data = await response.json();
+                console.log('Result:', data);
+                
+                if (data.success) {
+                    document.getElementById('amount').textContent = 
+                        Number.isInteger(data.amount) ? data.amount : data.amount.toFixed(2);
+                    document.getElementById('item').textContent = data.wantItem;
+                    document.getElementById('analysis').textContent = data.analysis;
+                    document.getElementById('result').classList.add('show');
+                }
+            } catch (err) {
+                alert('Error: ' + err.message);
+                console.error(err);
+            } finally {
+                document.getElementById('loading').style.display = 'none';
+            }
+        }
+        
+        // Auto-calculate on load
+        window.onload = () => calculate();
+    </script>
+</body>
+</html>
