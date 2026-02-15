@@ -1,9 +1,16 @@
 const { Low } = require('lowdb');
 const { JSONFile } = require('lowdb/node');
 const path = require('path');
+const fs = require('fs');
+
+// Ensure data directory exists
+const dataDir = path.join(__dirname, '../data');
+if (!fs.existsSync(dataDir)) {
+  fs.mkdirSync(dataDir, { recursive: true });
+}
 
 // Use file-based database as fallback when MongoDB is not available
-const adapter = new JSONFile(path.join(__dirname, '../data/db.json'));
+const adapter = new JSONFile(path.join(dataDir, 'db.json'));
 const db = new Low(adapter, {
   users: [],
   barters: [],
@@ -11,8 +18,17 @@ const db = new Low(adapter, {
 });
 
 async function init() {
-  await db.read();
-  await db.write();
+  try {
+    await db.read();
+    if (!db.data) {
+      db.data = { users: [], barters: [], trades: [] };
+    }
+    await db.write();
+    return true;
+  } catch (err) {
+    console.error('FileDB init error:', err.message);
+    throw err;
+  }
 }
 
 // User operations
