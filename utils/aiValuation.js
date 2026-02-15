@@ -242,10 +242,13 @@ const knowledgeBase = {
 
 async function getItemData(item) {
     const itemLower = item.toLowerCase();
+    console.log(`[getItemData] Processing: ${item}`);
     
     // Try real crypto prices first (FREE - no API key needed!)
+    console.log(`[getItemData] Trying CoinGecko for: ${item}`);
     const realPrice = await fetchCryptoPrice(item);
     if (realPrice) {
+        console.log(`[getItemData] Got real price for ${item}: $${realPrice}`);
         return { 
             value: realPrice, 
             type: 'crypto', 
@@ -256,6 +259,7 @@ async function getItemData(item) {
             realPrice: true
         };
     }
+    console.log(`[getItemData] No real price from CoinGecko for: ${item}`);
     
     // Try AI price estimation (if API keys available)
     const aiPrice = await fetchAIPriceEstimate(item) || await fetchTogetherAIPrice(item);
