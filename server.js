@@ -172,15 +172,12 @@ app.get('/api/health', async (req, res) => {
 // Stats endpoint
 app.get('/api/stats', async (req, res) => {
     try {
-        const Barter = require('./models/Barter');
-        const TradeHistory = require('./models/TradeHistory');
-        const User = require('./models/User');
+        const { Barter, TradeHistory, User } = require('./models').getModels();
 
         const [totalBarters, totalTrades, totalUsers, activeBarters] = await Promise.all([
-            Barter.countDocuments(),
-            TradeHistory.countDocuments(),
-            User.countDocuments(),
-            Barter.countDocuments({ status: { $in: ['pending', 'negotiating'] } })
+            Barter.countDocuments ? Barter.countDocuments() : Barter.countDocuments(),
+            TradeHistory.countDocuments ? TradeHistory.countDocuments() : 0,
+            User.countDocuments ? User.countDocuments() : (await User.find({})).length
         ]);
 
         res.json({
@@ -196,10 +193,10 @@ app.get('/api/stats', async (req, res) => {
         res.json({
             success: true,
             stats: {
-                totalBarters: 2847291,
-                totalTrades: 1458320,
-                totalUsers: 45291,
-                activeBarters: 3421
+                totalBarters: 0,
+                totalTrades: 0,
+                totalUsers: 0,
+                activeBarters: 0
             }
         });
     }

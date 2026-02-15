@@ -1,23 +1,35 @@
 const express = require('express');
 const router = express.Router();
 const { body, validationResult } = require('express-validator');
-const Barter = require('../models/Barter');
-const TradeHistory = require('../models/TradeHistory');
-const User = require('../models/User');
+const { getModels } = require('../models');
 const { authenticate, optionalAuth } = require('../middleware/auth');
 
 // Get all active barters (public feed)
 router.get('/feed', optionalAuth, async (req, res) => {
     try {
+        const { Barter } = getModels();
         const page = parseInt(req.query.page) || 1;
         const limit = parseInt(req.query.limit) || 20;
-        const skip = (page - 1) * limit;
 
-        const barters = await Barter.getActiveBarters(limit).skip(skip);
-        const total = await Barter.countDocuments({
-            status: { $in: ['pending', 'negotiating'] },
-            expiresAt: { $gt: new Date() }
-        });
+        let barters;
+        let total;
+        
+        if (Barter.getActiveBarters) {
+            // MongoDB
+            const skip = (page - 1) * limit;
+            barters = await Barter.getActiveBarters(limit).skip(skip);
+            total = await Barter.countDocuments({
+                status: { $in: ['pending', 'negotiating'] },
+                expiresAt: { $gt: new Date() }
+            });
+        } else {
+            // FileDB
+            barters = await Barter.find({ 
+                status: { $in: ['pending', 'negotiating'] }
+            });
+            total = barters.length;
+            barters = barters.slice(0, limit);
+        }
 
         res.json({
             success: true,
