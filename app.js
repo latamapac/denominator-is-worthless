@@ -16,13 +16,27 @@ let state = {
 const elements = {};
 
 // ===== INITIALIZATION =====
-document.addEventListener('DOMContentLoaded', () => {
-    cacheElements();
-    initSocket();
-    checkAuth();
-    initCanvas();
-    setupEventListeners();
-    loadInitialData();
+document.addEventListener('DOMContentLoaded', async () => {
+    try {
+        cacheElements();
+        initSocket();
+        checkAuth();
+        initCanvas();
+        setupEventListeners();
+        await loadInitialData();
+        console.log('✓ App initialized');
+    } catch (err) {
+        console.error('App initialization error:', err);
+        // Show error but don't break the page
+        if (elements.feed) {
+            elements.feed.innerHTML = `
+                <div class="error-state">
+                    <p>App loaded with errors. Some features may not work.</p>
+                    <button onclick="location.reload()">Refresh</button>
+                </div>
+            `;
+        }
+    }
 });
 
 function cacheElements() {
@@ -51,48 +65,43 @@ function cacheElements() {
 
 // ===== SOCKET.IO =====
 function initSocket() {
-    const token = localStorage.getItem('token');
-    
-    socket = io({
-        auth: token ? { token } : {},
-        transports: ['websocket', 'polling']
-    });
+    try {
+        const token = localStorage.getItem('token');
+        
+        socket = io({
+            auth: token ? { token } : {},
+            transports: ['polling', 'websocket'], // Prefer polling for Render free tier
+            timeout: 10000,
+            reconnectionAttempts: 3
+        });
 
-    socket.on('connect', () => {
-        console.log('✓ Socket connected');
-        showNotification('Connected to live feed', 'success');
-    });
+        socket.on('connect', () => {
+            console.log('✓ Socket connected');
+        });
 
-    socket.on('disconnect', () => {
-        console.log('✗ Socket disconnected');
-        showNotification('Disconnected from live feed', 'warning');
-    });
+        socket.on('connect_error', (err) => {
+            console.log('Socket connection error (expected on some networks):', err.message);
+            // Don't show error to user, app works without WebSocket
+        });
 
-    socket.on('new_barter', (barter) => {
-        addBarterToFeed(barter, true);
-        showNotification(`New barter: ${barter.offer.item} → ${barter.request.item}`, 'info');
-        incrementStat('activeBarters');
-    });
+        socket.on('disconnect', () => {
+            console.log('Socket disconnected');
+        });
 
-    socket.on('barter_completed', ({ barter }) => {
-        updateBarterStatus(barter._id, 'completed');
-        showNotification(`Barter completed: ${barter.offer.item} ↔ ${barter.request.item}`, 'success');
-    });
+        socket.on('new_barter', (barter) => {
+            addBarterToFeed(barter, true);
+            showNotification(`New barter: ${barter.offer.item} → ${barter.request.item}`, 'info');
+            incrementStat('activeBarters');
+        });
 
-    socket.on('barter_negotiation', ({ barterId, negotiation }) => {
-        if (state.currentBarterId === barterId) {
-            addNegotiationMessage(negotiation);
-        }
-        showNotification('New negotiation message', 'info');
-    });
-
-    socket.on('user_online', ({ username }) => {
-        console.log(`${username} is online`);
-    });
-
-    socket.on('user_typing', ({ username }) => {
-        showTypingIndicator(username);
-    });
+        socket.on('barter_completed', ({ barter }) => {
+            updateBarterStatus(barter._id, 'completed');
+            showNotification(`Barter completed: ${barter.offer.item} ↔ ${barter.request.item}`, 'success');
+        });
+    } catch (err) {
+        console.log('Socket.IO not available, app will work without real-time updates');
+        socket = null;
+    }
 }
 
 // ===== AUTHENTICATION =====
@@ -629,10 +638,56 @@ function resetBarterForm() {
     elements.resultPanel.classList.remove('has-result');
 }
 
-function loadInitialData() {
-    loadFeed();
-    loadLeaderboard();
-    loadStats();
+async function loadInitialData() {
+    // Load all data in parallel with timeout
+    await Promise.all([
+        loadFeedWithTimeout(),
+        loadLeaderboardWithTimeout(),
+        loadStatsWithTimeout()
+    ]);
+}
+
+async function loadFeedWithTimeout() {
+    try {
+        const timeout = new Promise((_, reject) => 
+            setTimeout(() => reject(new Error('Timeout')), 10000)
+        );
+        await Promise.race([loadFeed(), timeout]);
+    } catch (err) {
+        console.error('Feed load timeout:', err);
+        if (elements.feed) {
+            elements.feed.innerHTML = `
+                <div class="error-state">
+                    <p>Failed to load feed. <button onclick="loadFeed()">Retry</button></p>
+                </div>
+            `;
+        }
+    }
+}
+
+async function loadLeaderboardWithTimeout() {
+    try {
+        const timeout = new Promise((_, reject) => 
+            setTimeout(() => reject(new Error('Timeout')), 5000)
+        );
+        await Promise.race([loadLeaderboard(), timeout]);
+    } catch (err) {
+        console.error('Leaderboard timeout');
+        if (elements.leaderboard) {
+            elements.leaderboard.innerHTML = '<p>Leaderboard unavailable</p>';
+        }
+    }
+}
+
+async function loadStatsWithTimeout() {
+    try {
+        const timeout = new Promise((_, reject) => 
+            setTimeout(() => reject(new Error('Timeout')), 5000)
+        );
+        await Promise.race([loadStats(), timeout]);
+    } catch (err) {
+        console.error('Stats timeout');
+    }
 }
 
 // ===== CANVAS BACKGROUND =====
