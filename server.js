@@ -62,15 +62,14 @@ app.use(helmet({
 app.use(cors());
 app.use(express.json({ limit: '10mb' }));
 
-// Root route BEFORE static files
+// Static files FIRST (so specific files work)
+app.use('/public', express.static(path.join(__dirname, 'public')));
+app.use(express.static(path.join(__dirname, 'public'), { index: false }));
+
+// Root route AFTER static files
 app.get('/', (req, res) => {
     res.sendFile(path.join(__dirname, 'public', 'ai-calculator.html'));
 });
-
-// Static files
-app.use(express.static('.', { index: false }));
-app.use('/public', express.static(path.join(__dirname, 'public')));
-app.use(express.static(path.join(__dirname, 'public'), { index: false }));
 
 // Rate limiting
 const limiter = rateLimit({
