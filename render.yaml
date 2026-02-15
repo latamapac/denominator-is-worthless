@@ -12,12 +12,20 @@ services:
       - key: JWT_SECRET
         generateValue: true
       - key: MONGODB_URI
-        fromDatabase:
-          name: denominator-mongodb
-          property: connectionString
+        value: mongodb://mongo:27017/denominator
+    disk:
+      name: mongo-data
+      mountPath: /data/db
+      sizeGB: 1
 
-databases:
-  - name: denominator-mongodb
-    databaseName: denominator
-    user: denominator
-    plan: free
+  - type: pserv
+    name: denominator-mongo
+    runtime: docker
+    dockerfilePath: ./mongo.Dockerfile
+    disk:
+      name: mongo-data
+      mountPath: /data/db
+      sizeGB: 1
+    envVars:
+      - key: MONGO_INITDB_DATABASE
+        value: denominator

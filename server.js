@@ -76,11 +76,19 @@ app.use('/api/auth/login', authLimiter);
 app.use('/api/auth/register', authLimiter);
 
 // Database connection
+let useFileDB = false;
+
 mongoose.connect(MONGODB_URI)
     .then(() => console.log('✓ MongoDB connected'))
-    .catch(err => {
+    .catch(async err => {
         console.error('✗ MongoDB connection error:', err.message);
-        console.log('  Running without database (some features disabled)');
+        console.log('  Falling back to file-based database...');
+        
+        // Initialize file-based database
+        const fileDB = require('./utils/fileDB');
+        await fileDB.init();
+        useFileDB = true;
+        console.log('✓ File-based database active');
     });
 
 // Routes
@@ -134,7 +142,7 @@ app.get('/api/image/:item', async (req, res) => {
 
 // Health check
 app.get('/api/health', async (req, res) => {
-    const dbStatus = mongoose.connection.readyState === 1 ? 'connected' : 'disconnected';
+    const dbStatus = mongoose.connection.readyState === 1 ? 'connected' : (useFileDB ? 'file' : 'disconnected');
     
     res.json({
         status: 'operational',
@@ -147,7 +155,7 @@ app.get('/api/health', async (req, res) => {
         features: {
             websocket: true,
             authentication: true,
-            database: dbStatus === 'connected'
+            database: dbStatus !== 'disconnected'
         }
     });
 });
