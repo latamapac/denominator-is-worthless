@@ -53,10 +53,14 @@ async function fetchCryptoPrice(itemName) {
     
     try {
         // CoinGecko free API - no key needed!
+        const controller = new AbortController();
+        const timeout = setTimeout(() => controller.abort(), 5000);
+        
         const response = await fetch(
             `https://api.coingecko.com/api/v3/simple/price?ids=${coinId}&vs_currencies=usd`,
-            { timeout: 5000 }
+            { signal: controller.signal }
         );
+        clearTimeout(timeout);
         
         if (!response.ok) throw new Error('CoinGecko API failed');
         
@@ -107,6 +111,9 @@ async function fetchAIPriceEstimate(itemName) {
     }
     
     try {
+        const controller = new AbortController();
+        const timeoutId = setTimeout(() => controller.abort(), 8000);
+        
         const response = await fetch('https://api.groq.com/openai/v1/chat/completions', {
             method: 'POST',
             headers: {
@@ -128,8 +135,9 @@ async function fetchAIPriceEstimate(itemName) {
                 temperature: 0.1,
                 max_tokens: 20
             }),
-            timeout: 8000
+            signal: controller.signal
         });
+        clearTimeout(timeoutId);
         
         if (!response.ok) {
             console.log('Groq API error:', response.status);
