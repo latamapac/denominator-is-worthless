@@ -1,0 +1,260 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>AI Barter Calculator</title>
+    <style>
+        * { box-sizing: border-box; }
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+            background: #0a0a0f;
+            color: #fff;
+            max-width: 600px;
+            margin: 0 auto;
+            padding: 40px 20px;
+            line-height: 1.6;
+        }
+        h1 {
+            text-align: center;
+            font-size: 1.8rem;
+            margin-bottom: 10px;
+            background: linear-gradient(90deg, #00f0ff, #ff006e);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+        }
+        .subtitle {
+            text-align: center;
+            color: #888;
+            margin-bottom: 40px;
+            font-size: 0.95rem;
+        }
+        .box {
+            background: #111118;
+            border: 1px solid #333;
+            border-radius: 16px;
+            padding: 25px;
+            margin-bottom: 20px;
+        }
+        label {
+            display: block;
+            color: #00f0ff;
+            font-size: 0.85rem;
+            margin-bottom: 8px;
+            text-transform: uppercase;
+            letter-spacing: 0.1em;
+        }
+        input {
+            width: 100%;
+            padding: 15px;
+            font-size: 1.1rem;
+            background: #0a0a0f;
+            border: 2px solid #333;
+            border-radius: 10px;
+            color: #fff;
+            margin-bottom: 5px;
+        }
+        input:focus {
+            outline: none;
+            border-color: #00f0ff;
+        }
+        button {
+            width: 100%;
+            padding: 18px;
+            font-size: 1.1rem;
+            font-weight: bold;
+            background: linear-gradient(90deg, #00f0ff, #ff006e);
+            border: none;
+            border-radius: 10px;
+            color: #000;
+            cursor: pointer;
+            margin-top: 10px;
+        }
+        button:hover {
+            opacity: 0.9;
+        }
+        button:disabled {
+            opacity: 0.5;
+            cursor: wait;
+        }
+        #result {
+            display: none;
+            background: #111118;
+            border: 1px solid #00f0ff;
+            border-radius: 16px;
+            padding: 30px;
+            margin-top: 20px;
+            text-align: center;
+        }
+        #result.show { display: block; }
+        .amount {
+            font-size: 4rem;
+            font-weight: bold;
+            color: #00f0ff;
+            text-shadow: 0 0 20px rgba(0, 240, 255, 0.5);
+        }
+        .item-name {
+            font-size: 1.3rem;
+            color: #888;
+            margin-top: 10px;
+        }
+        .analysis {
+            margin-top: 20px;
+            padding-top: 20px;
+            border-top: 1px solid #333;
+            color: #aaa;
+            font-style: italic;
+        }
+        .error {
+            background: #331111;
+            border: 1px solid #ff4444;
+            color: #ff8888;
+            padding: 15px;
+            border-radius: 10px;
+            margin-top: 20px;
+            display: none;
+        }
+        .error.show { display: block; }
+        .examples {
+            margin-top: 30px;
+        }
+        .examples-title {
+            text-align: center;
+            color: #666;
+            font-size: 0.9rem;
+            margin-bottom: 15px;
+        }
+        .example-btn {
+            display: inline-block;
+            padding: 10px 15px;
+            margin: 5px;
+            background: #1a1a24;
+            border: 1px solid #333;
+            border-radius: 20px;
+            color: #888;
+            cursor: pointer;
+            font-size: 0.9rem;
+            transition: all 0.2s;
+        }
+        .example-btn:hover {
+            border-color: #00f0ff;
+            color: #00f0ff;
+        }
+    </style>
+</head>
+<body>
+    <h1>∅ DENOMINATOR IS WORTHLESS</h1>
+    <p class="subtitle">AI calculates fair exchange between anything</p>
+
+    <div class="box">
+        <label>You Have</label>
+        <input type="text" id="haveInput" placeholder="e.g., 1 Bitcoin" value="1 Bitcoin">
+        
+        <label style="margin-top: 20px;">You Want</label>
+        <input type="text" id="wantInput" placeholder="e.g., Tesla Model 3" value="Tesla Model 3">
+        
+        <button id="calcBtn" onclick="doCalculate()">⚡ CALCULATE EXCHANGE</button>
+    </div>
+
+    <div id="error" class="error"></div>
+
+    <div id="result">
+        <div class="amount" id="resultAmount">0</div>
+        <div class="item-name" id="resultItem">-</div>
+        <div class="analysis" id="resultAnalysis">-</div>
+    </div>
+
+    <div class="examples">
+        <p class="examples-title">Try these examples:</p>
+        <div style="text-align: center;">
+            <span class="example-btn" onclick="setEx('1 Bitcoin', 'Tesla Model 3')">💰 BTC → Tesla</span>
+            <span class="example-btn" onclick="setEx('1 hour coding', 'pizza')">💻 Code → Pizza</span>
+            <span class="example-btn" onclick="setEx('Rolex', 'iPhone')">⌚ Rolex → iPhone</span>
+            <span class="example-btn" onclick="setEx('Lamborghini', 'yacht')">🏎️ Lambo → Yacht</span>
+            <span class="example-btn" onclick="setEx('Picasso', 'mansion')">🎨 Picasso → Mansion</span>
+        </div>
+    </div>
+
+    <script>
+        // Test API on load
+        console.log('Page loaded');
+        fetch('/api/health')
+            .then(r => r.json())
+            .then(d => console.log('API OK:', d))
+            .catch(e => console.error('API error:', e));
+
+        function setEx(have, want) {
+            document.getElementById('haveInput').value = have;
+            document.getElementById('wantInput').value = want;
+            doCalculate();
+        }
+
+        async function doCalculate() {
+            const have = document.getElementById('haveInput').value.trim();
+            const want = document.getElementById('wantInput').value.trim();
+            const btn = document.getElementById('calcBtn');
+            const errorDiv = document.getElementById('error');
+            const resultDiv = document.getElementById('result');
+
+            if (!have || !want) {
+                errorDiv.textContent = 'Please enter both items';
+                errorDiv.classList.add('show');
+                return;
+            }
+
+            errorDiv.classList.remove('show');
+            resultDiv.classList.remove('show');
+            btn.disabled = true;
+            btn.textContent = '🧠 AI Thinking...';
+
+            try {
+                console.log('Sending request:', { have, want });
+                
+                const response = await fetch('/api/valuate', {
+                    method: 'POST',
+                    headers: { 
+                        'Content-Type': 'application/json'
+                    },
+                    body: JSON.stringify({
+                        haveItem: have,
+                        haveAmount: 1,
+                        wantItem: want
+                    })
+                });
+
+                console.log('Response status:', response.status);
+                
+                if (!response.ok) {
+                    throw new Error('Server error: ' + response.status);
+                }
+
+                const data = await response.json();
+                console.log('Data received:', data);
+
+                if (data.success) {
+                    document.getElementById('resultAmount').textContent = 
+                        data.amount < 1 ? data.amount.toFixed(2) : 
+                        Number.isInteger(data.amount) ? data.amount : data.amount.toFixed(1);
+                    document.getElementById('resultItem').textContent = data.wantItem;
+                    document.getElementById('resultAnalysis').textContent = data.analysis;
+                    resultDiv.classList.add('show');
+                } else {
+                    throw new Error(data.error || 'Calculation failed');
+                }
+            } catch (err) {
+                console.error('Error:', err);
+                errorDiv.textContent = 'Error: ' + err.message;
+                errorDiv.classList.add('show');
+            } finally {
+                btn.disabled = false;
+                btn.textContent = '⚡ CALCULATE EXCHANGE';
+            }
+        }
+
+        // Auto-calculate on Enter key
+        document.getElementById('wantInput').addEventListener('keypress', function(e) {
+            if (e.key === 'Enter') doCalculate();
+        });
+    </script>
+</body>
+</html>
