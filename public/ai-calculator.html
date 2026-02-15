@@ -440,6 +440,15 @@
         }
 
         document.getElementById('haveItem').focus();
+        
+        // Quick test on load
+        setTimeout(() => {
+            console.log('Page loaded, API URL:', API_URL);
+            fetch(`${API_URL}/api/health`)
+                .then(r => r.json())
+                .then(d => console.log('Health:', d))
+                .catch(e => console.error('Health check failed:', e));
+        }, 1000);
     </script>
 </body>
 </html>
