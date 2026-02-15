@@ -61,7 +61,14 @@ app.use(helmet({
 
 app.use(cors());
 app.use(express.json({ limit: '10mb' }));
-app.use(express.static('.'));
+
+// Root route BEFORE static files
+app.get('/', (req, res) => {
+    res.sendFile(path.join(__dirname, 'public', 'ai-calculator.html'));
+});
+
+// Static files
+app.use(express.static('.', { index: false }));
 app.use('/public', express.static(path.join(__dirname, 'public')));
 
 // Rate limiting
@@ -113,11 +120,6 @@ initDatabase();
 app.use('/api/auth', authRoutes);
 app.use('/api/barters', barterRoutes);
 app.use('/api/users', userRoutes);
-
-// Serve AI Calculator as default
-app.get('/ai-calculator.html', (req, res) => {
-    res.sendFile(path.join(__dirname, 'public', 'ai-calculator.html'));
-});
 
 // AI Valuation endpoint
 app.post('/api/valuate', async (req, res) => {
@@ -279,11 +281,7 @@ io.on('connection', (socket) => {
     });
 });
 
-// Main app route - redirect to AI calculator for viral effect
-app.get('/', (req, res) => {
-    res.sendFile(path.join(__dirname, 'public', 'ai-calculator.html'));
-});
-
+// Main app route for full platform
 app.get('/app', (req, res) => {
     res.sendFile(path.join(__dirname, 'index.html'));
 });
