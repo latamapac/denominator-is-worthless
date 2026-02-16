@@ -292,25 +292,35 @@ async function getItemData(item) {
     }
     console.log(`[getItemData] No real price from CoinGecko for: ${item}`);
     
-    // Try AI price estimation (if API keys available)
-    const aiPrice = await fetchAIPriceEstimate(item) || await fetchTogetherAIPrice(item);
-    if (aiPrice) {
-        return {
-            value: aiPrice,
-            type: 'estimated',
-            scarcity: 50,
-            utility: 60,
-            name: itemLower,
-            desc: 'estimated item',
-            realPrice: true
-        };
-    }
-    
-    // Fall back to knowledge base
+    // Try AI price estimation (if API keys available) - ONLY for items not in knowledge base
+    // Check knowledge base first to avoid wasting AI calls on known items
+    let kbMatch = null;
     for (const [key, data] of Object.entries(knowledgeBase)) {
         if (itemLower.includes(key)) {
-            return { ...data, name: key, realPrice: false };
+            kbMatch = { ...data, name: key, realPrice: false };
+            break;
         }
+    }
+    
+    // If no knowledge base match, try AI
+    if (!kbMatch) {
+        console.log(`[getItemData] No KB match for "${item}", trying AI...`);
+        const aiPrice = await fetchAIPriceEstimate(item) || await fetchTogetherAIPrice(item);
+        if (aiPrice) {
+            console.log(`[getItemData] AI estimated "${item}" at $${aiPrice}`);
+            return {
+                value: aiPrice,
+                type: 'estimated',
+                scarcity: 50,
+                utility: 60,
+                name: itemLower,
+                desc: 'AI-estimated item',
+                realPrice: true
+            };
+        }
+    } else {
+        console.log(`[getItemData] Using knowledge base for "${item}": $${kbMatch.value}`);
+        return kbMatch;
     }
     
     // Smart defaults based on keywords
