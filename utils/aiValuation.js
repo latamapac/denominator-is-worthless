@@ -469,25 +469,24 @@ async function getItemData(item) {
     const itemLower = item.toLowerCase();
     console.log(`[getItemData] Processing: ${item}`);
     
-    // Try real crypto prices first (FREE - no API key needed!)
-    console.log(`[getItemData] Trying CoinGecko for: ${item}`);
+    // PRIORITY 1: Try real crypto prices from APIs (most accurate!)
+    console.log(`[getItemData] Trying CoinGecko/CoinCap for: ${item}`);
     const realPrice = await fetchCryptoPrice(item);
     if (realPrice) {
-        console.log(`[getItemData] Got real price for ${item}: $${realPrice}`);
+        console.log(`[getItemData] Got REAL price for ${item}: $${realPrice}`);
         return { 
             value: realPrice, 
             type: 'crypto', 
             scarcity: 85, 
             utility: 60, 
             name: itemLower,
-            desc: 'cryptocurrency',
+            desc: 'live cryptocurrency price',
             realPrice: true
         };
     }
-    console.log(`[getItemData] No real price from CoinGecko for: ${item}`);
+    console.log(`[getItemData] No real price from APIs for: ${item}`);
     
-    // Try AI price estimation (if API keys available) - ONLY for items not in knowledge base
-    // Check knowledge base first to avoid wasting AI calls on known items
+    // PRIORITY 2: Check knowledge base (accurate static prices)
     let kbMatch = null;
     for (const [key, data] of Object.entries(knowledgeBase)) {
         if (itemLower.includes(key)) {
@@ -496,25 +495,26 @@ async function getItemData(item) {
         }
     }
     
-    // If no knowledge base match, try AI
-    if (!kbMatch) {
-        console.log(`[getItemData] No KB match for "${item}", trying AI...`);
-        const aiPrice = await fetchAIPriceEstimate(item) || await fetchTogetherAIPrice(item);
-        if (aiPrice) {
-            console.log(`[getItemData] AI estimated "${item}" at $${aiPrice}`);
-            return {
-                value: aiPrice,
-                type: 'estimated',
-                scarcity: 50,
-                utility: 60,
-                name: itemLower,
-                desc: 'AI-estimated item',
-                realPrice: true
-            };
-        }
-    } else {
+    // If knowledge base match found, use it (good static data)
+    if (kbMatch) {
         console.log(`[getItemData] Using knowledge base for "${item}": $${kbMatch.value}`);
         return kbMatch;
+    }
+    
+    // PRIORITY 3: Try AI for completely unknown items
+    console.log(`[getItemData] No KB match for "${item}", trying AI...`);
+    const aiPrice = await fetchAIPriceEstimate(item) || await fetchTogetherAIPrice(item);
+    if (aiPrice) {
+        console.log(`[getItemData] AI estimated "${item}" at $${aiPrice}`);
+        return {
+            value: aiPrice,
+            type: 'estimated',
+            scarcity: 50,
+            utility: 60,
+            name: itemLower,
+            desc: 'AI-estimated item',
+            realPrice: true
+        };
     }
     
     // Smart defaults based on keywords
