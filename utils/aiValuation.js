@@ -194,6 +194,124 @@ async function fetchAIPriceEstimate(itemName) {
     return null;
 }
 
+// Google Gemini Flash (15B tokens/month FREE!)
+async function fetchGeminiPrice(itemName) {
+    const apiKey = process.env.GEMINI_API_KEY;
+    if (!apiKey) return null;
+    
+    const lower = itemName.toLowerCase();
+    if (priceCache.has(`gemini:${lower}`)) {
+        const cached = priceCache.get(`gemini:${lower}`);
+        if (Date.now() - cached.timestamp < PRICE_CACHE_TTL) {
+            return cached.price;
+        }
+    }
+    
+    try {
+        const response = await fetch(
+            `https://generativelanguage.googleapis.com/v1beta/models/gemini-1.5-flash:generateContent?key=${apiKey}`,
+            {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify({
+                    contents: [{
+                        parts: [{
+                            text: `What is the average market price of "${itemName}" in USD? Reply with just the number, no other text.`
+                        }]
+                    }],
+                    generationConfig: {
+                        temperature: 0.1,
+                        maxOutputTokens: 20
+                    }
+                })
+            }
+        );
+        
+        if (!response.ok) {
+            console.log(`[Gemini] API error: ${response.status}`);
+            return null;
+        }
+        
+        const data = await response.json();
+        const content = data.candidates?.[0]?.content?.parts?.[0]?.text?.trim();
+        
+        const match = content?.match(/[\d,]+\.?\d*/);
+        if (match) {
+            const price = parseFloat(match[0].replace(/,/g, ''));
+            if (price > 0 && price < 1000000000) {
+                console.log(`[Gemini] ${itemName}: $${price}`);
+                priceCache.set(`gemini:${lower}`, { price, timestamp: Date.now() });
+                return price;
+            }
+        }
+    } catch (error) {
+        console.log(`[Gemini] Error: ${error.message}`);
+    }
+    
+    return null;
+}
+
+// DeepSeek V3 (Cheapest paid option - $0.07/1M tokens!)
+async function fetchDeepSeekPrice(itemName) {
+    const apiKey = process.env.DEEPSEEK_API_KEY;
+    if (!apiKey) return null;
+    
+    const lower = itemName.toLowerCase();
+    if (priceCache.has(`deepseek:${lower}`)) {
+        const cached = priceCache.get(`deepseek:${lower}`);
+        if (Date.now() - cached.timestamp < PRICE_CACHE_TTL) {
+            return cached.price;
+        }
+    }
+    
+    try {
+        const response = await fetch('https://api.deepseek.com/v1/chat/completions', {
+            method: 'POST',
+            headers: {
+                'Authorization': `Bearer ${apiKey}`,
+                'Content-Type': 'application/json'
+            },
+            body: JSON.stringify({
+                model: 'deepseek-chat',
+                messages: [
+                    {
+                        role: 'system',
+                        content: 'Respond ONLY with a number - the estimated price in USD. No explanation.'
+                    },
+                    {
+                        role: 'user',
+                        content: `Price of "${itemName}" in USD. Just the number.`
+                    }
+                ],
+                temperature: 0.1,
+                max_tokens: 20
+            })
+        });
+        
+        if (!response.ok) {
+            console.log(`[DeepSeek] API error: ${response.status}`);
+            return null;
+        }
+        
+        const data = await response.json();
+        const content = data.choices?.[0]?.message?.content?.trim();
+        
+        const match = content?.match(/[\d,]+\.?\d*/);
+        if (match) {
+            const price = parseFloat(match[0].replace(/,/g, ''));
+            if (price > 0 && price < 1000000000) {
+                console.log(`[DeepSeek] ${itemName}: $${price}`);
+                priceCache.set(`deepseek:${lower}`, { price, timestamp: Date.now() });
+                return price;
+            }
+        }
+    } catch (error) {
+        console.log(`[DeepSeek] Error: ${error.message}`);
+    }
+    
+    return null;
+}
+
 // Together AI free tier (alternative)
 async function fetchTogetherAIPrice(itemName) {
     const apiKey = process.env.TOGETHER_API_KEY;
@@ -503,9 +621,15 @@ async function getItemData(item) {
         return kbMatch;
     }
     
-    // PRIORITY 3: Try AI for completely unknown items
-    console.log(`[getItemData] No KB match for "${item}", trying AI...`);
-    const aiPrice = await fetchAIPriceEstimate(item) || await fetchTogetherAIPrice(item);
+    // PRIORITY 3: Try AI for completely unknown items (multiple providers for redundancy)
+    console.log(`[getItemData] No KB match for "${item}", trying AI providers...`);
+    
+    // Try in order: Groq → Gemini → DeepSeek → Together
+    const aiPrice = await fetchAIPriceEstimate(item) || 
+                    await fetchGeminiPrice(item) || 
+                    await fetchDeepSeekPrice(item) ||
+                    await fetchTogetherAIPrice(item);
+    
     if (aiPrice) {
         console.log(`[getItemData] AI estimated "${item}" at $${aiPrice}`);
         return {
