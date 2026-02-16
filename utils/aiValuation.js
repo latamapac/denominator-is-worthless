@@ -177,15 +177,19 @@ async function fetchAIPriceEstimate(itemName) {
         const data = await response.json();
         const content = data.choices?.[0]?.message?.content?.trim();
         
+        console.log(`[Groq RAW] "${itemName}" -> "${content}"`);
+        
         // Extract number from response
         const match = content?.match(/[\d,]+\.?\d*/);
         if (match) {
             const price = parseFloat(match[0].replace(/,/g, ''));
+            console.log(`[Groq PARSED] "${itemName}" -> $${price}`);
             if (price > 0 && price < 1000000000) { // Sanity check
-                console.log(`[AI Price] ${itemName}: $${price}`);
                 priceCache.set(`ai:${lower}`, { price, timestamp: Date.now() });
                 return price;
             }
+        } else {
+            console.log(`[Groq ERROR] No number found in: "${content}"`);
         }
     } catch (error) {
         console.log('Groq error:', error.message);
