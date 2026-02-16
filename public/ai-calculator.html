@@ -314,7 +314,6 @@
                 <div class="item-side want-side">
                     <div class="side-label">▲ YOU WANT</div>
                     <input type="text" id="wantItem" class="item-input" placeholder="e.g., Tesla Model 3">
-                    <input type="text" id="wantAmount" class="amount-input" placeholder="?" readonly style="color: var(--primary); font-size: 1.5rem;">
                 </div>
             </div>
 
@@ -450,7 +449,7 @@
             
             document.getElementById('resultAmount').textContent = amount;
             document.getElementById('resultItem').textContent = data.wantItem;
-            document.getElementById('wantAmount').value = amount;
+            // Result display only in result panel
             document.getElementById('analysisText').textContent = data.analysis;
             document.getElementById('utilityValue').textContent = `${data.factors.utility}%`;
             document.getElementById('scarcityValue').textContent = `${data.factors.scarcity}%`;
