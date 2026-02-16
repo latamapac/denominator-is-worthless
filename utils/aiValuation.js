@@ -4,7 +4,7 @@ const fetch = require('node-fetch');
 const valuationCache = new Map();
 const priceCache = new Map();
 const CACHE_TTL = 5 * 60 * 1000;
-const PRICE_CACHE_TTL = 10 * 60 * 1000; // 10 minutes for real prices
+const PRICE_CACHE_TTL = 60 * 60 * 1000; // 1 hour for AI-estimated prices
 
 // CoinGecko ID mapping
 const COINGECKO_IDS = {
@@ -159,7 +159,7 @@ async function fetchAIPriceEstimate(itemName) {
                     },
                     {
                         role: 'user',
-                        content: `Price of: ${itemName} (USD). Reply with just the number.`
+                        content: `Average market rate for: ${itemName}. Reply with typical USD price as just a number.`
                     }
                 ],
                 temperature: 0.1,
