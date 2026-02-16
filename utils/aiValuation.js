@@ -541,6 +541,8 @@ const knowledgeBase = {
     'vintage': { value: 500, type: 'collectible', scarcity: 70, utility: 30, desc: 'old collectible' },
     'antique': { value: 800, type: 'collectible', scarcity: 75, utility: 25, desc: '100+ years old' },
     'trading cards': { value: 200, type: 'collectible', scarcity: 60, utility: 35, desc: 'sports/pokemon' },
+    'pokemon card': { value: 150, type: 'collectible', scarcity: 65, utility: 30, desc: 'pokemon trading card' },
+    'charizard': { value: 500, type: 'collectible', scarcity: 85, utility: 25, desc: 'rare pokemon card' },
     'comic book': { value: 100, type: 'collectible', scarcity: 50, utility: 40, desc: 'vintage comics' },
     'vinyl record': { value: 30, type: 'collectible', scarcity: 40, utility: 45, desc: 'LP album' },
     'action figure': { value: 50, type: 'collectible', scarcity: 45, utility: 30, desc: 'collectible toy' },
