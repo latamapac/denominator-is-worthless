@@ -51,15 +51,17 @@ async function fetchCryptoPrice(itemName) {
     
     if (!coinId) return null;
     
-    // Try CoinGecko first
+    // Try CoinGecko first (with demo API key if available)
     try {
+        const cgApiKey = process.env.COINGECKO_API_KEY;
+        const apiUrl = cgApiKey 
+            ? `https://api.coingecko.com/api/v3/simple/price?ids=${coinId}&vs_currencies=usd&x_cg_demo_api_key=${cgApiKey}`
+            : `https://api.coingecko.com/api/v3/simple/price?ids=${coinId}&vs_currencies=usd`;
+        
         const controller = new AbortController();
         const timeout = setTimeout(() => controller.abort(), 5000);
         
-        const response = await fetch(
-            `https://api.coingecko.com/api/v3/simple/price?ids=${coinId}&vs_currencies=usd`,
-            { signal: controller.signal }
-        );
+        const response = await fetch(apiUrl, { signal: controller.signal });
         clearTimeout(timeout);
         
         if (response.ok) {
