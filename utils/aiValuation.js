@@ -159,7 +159,7 @@ async function fetchAIPriceEstimate(itemName) {
                     },
                     {
                         role: 'user',
-                        content: `What is the average market price of "${itemName}" in USD? Give just the number, no text. If unknown, estimate based on similar items.`
+                        content: `Price of: ${itemName} (USD). Reply with just the number.`
                     }
                 ],
                 temperature: 0.1,
@@ -216,7 +216,7 @@ async function fetchGeminiPrice(itemName) {
                 body: JSON.stringify({
                     contents: [{
                         parts: [{
-                            text: `What is the average market price of "${itemName}" in USD? Reply with just the number, no other text.`
+                            text: `Price of: ${itemName} (USD). Reply with just the number.`
                         }]
                     }],
                     generationConfig: {
