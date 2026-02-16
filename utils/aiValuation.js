@@ -58,23 +58,26 @@ async function fetchCryptoPrice(itemName) {
             ? `https://api.coingecko.com/api/v3/simple/price?ids=${coinId}&vs_currencies=usd&x_cg_demo_api_key=${cgApiKey}`
             : `https://api.coingecko.com/api/v3/simple/price?ids=${coinId}&vs_currencies=usd`;
         
-        const controller = new AbortController();
-        const timeout = setTimeout(() => controller.abort(), 5000);
-        
-        const response = await fetch(apiUrl, { signal: controller.signal });
-        clearTimeout(timeout);
+        console.log(`[CoinGecko] Fetching: ${apiUrl.substring(0, 80)}...`);
+        const response = await fetch(apiUrl, { timeout: 8000 });
+        console.log(`[CoinGecko] Response status: ${response.status}`);
         
         if (response.ok) {
             const data = await response.json();
+            console.log(`[CoinGecko] Raw data:`, JSON.stringify(data).substring(0, 200));
             const price = data[coinId]?.usd;
             if (price) {
                 priceCache.set(lower, { price, timestamp: Date.now() });
-                console.log(`[CoinGecko] ${itemName}: $${price}`);
+                console.log(`[CoinGecko] SUCCESS ${itemName}: $${price}`);
                 return price;
+            } else {
+                console.log(`[CoinGecko] No price in response for ${coinId}`);
             }
+        } else {
+            console.log(`[CoinGecko] HTTP error: ${response.status}`);
         }
     } catch (error) {
-        console.log(`CoinGecko failed for ${itemName}: ${error.message}`);
+        console.log(`[CoinGecko] EXCEPTION for ${itemName}: ${error.message}`);
     }
     
     // Fallback: Try CoinCap API (also free, no key)
@@ -84,27 +87,23 @@ async function fetchCryptoPrice(itemName) {
                       coinId === 'solana' ? 'solana' : null;
         
         if (symbol) {
-            const controller = new AbortController();
-            const timeout = setTimeout(() => controller.abort(), 5000);
-            
-            const response = await fetch(
-                `https://api.coincap.io/v2/assets/${symbol}`,
-                { signal: controller.signal }
-            );
-            clearTimeout(timeout);
+            console.log(`[CoinCap] Trying ${symbol}...`);
+            const response = await fetch(`https://api.coincap.io/v2/assets/${symbol}`, { timeout: 8000 });
             
             if (response.ok) {
                 const data = await response.json();
                 const price = parseFloat(data.data?.priceUsd);
                 if (price) {
                     priceCache.set(lower, { price, timestamp: Date.now() });
-                    console.log(`[CoinCap] ${itemName}: $${price}`);
+                    console.log(`[CoinCap] SUCCESS ${itemName}: $${price}`);
                     return price;
                 }
+            } else {
+                console.log(`[CoinCap] HTTP error: ${response.status}`);
             }
         }
     } catch (error) {
-        console.log(`CoinCap failed for ${itemName}: ${error.message}`);
+        console.log(`[CoinCap] EXCEPTION for ${itemName}: ${error.message}`);
     }
     
     return null;
