@@ -624,6 +624,13 @@ async function getItemData(item) {
         }
     }
     
+    // If knowledge base match found BUT input is much longer/more specific, use AI instead
+    // This handles cases like "kilogram of camel meat in egypt" vs just "camel"
+    if (kbMatch && itemLower.length > kbMatch.name.length * 2) {
+        console.log(`[getItemData] KB match "${kbMatch.name}" too short for input "${item}" (${itemLower.length} vs ${kbMatch.name.length}), using AI`);
+        kbMatch = null; // Force AI path
+    }
+    
     // If knowledge base match found, use it (good static data)
     if (kbMatch) {
         console.log(`[getItemData] Using knowledge base for "${item}": $${kbMatch.value} (matched: "${kbMatch.name}")`);
