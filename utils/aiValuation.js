@@ -339,7 +339,10 @@ const knowledgeBase = {
     
     // SERVICES (BLS wage data + market rates)
     'hour of coding': { value: 75, type: 'service', scarcity: 45, utility: 90, desc: 'software dev' },
+    'hour coding': { value: 75, type: 'service', scarcity: 45, utility: 90, desc: 'software dev' },
+    'coding': { value: 75, type: 'service', scarcity: 45, utility: 90, desc: 'software dev' },
     'hour of programming': { value: 80, type: 'service', scarcity: 48, utility: 90, desc: 'developer time' },
+    'hour programming': { value: 80, type: 'service', scarcity: 48, utility: 90, desc: 'developer time' },
     'hour of design': { value: 65, type: 'service', scarcity: 40, utility: 85, desc: 'graphic design' },
     'hour of labor': { value: 28, type: 'service', scarcity: 25, utility: 80, desc: 'general labor' },
     'hour of consulting': { value: 150, type: 'service', scarcity: 55, utility: 85, desc: 'expert advice' },
