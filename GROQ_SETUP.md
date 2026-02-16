@@ -1,19 +1,19 @@
 # Groq AI Price Estimation Setup
 
-Get free API key from: https://console.groq.com/keys
+Groq AI estimates prices for ANY item not in our knowledge base.
 
-Then add to Render environment variables:
-- Key: `GROQ_API_KEY`
-- Value: `gsk_xxxxx` (your key)
+## Setup (Render Dashboard)
+1. Go to https://dashboard.render.com
+2. Select your service  
+3. Click "Environment" tab
+4. Add Variable:
+   - Key: `GROQ_API_KEY`
+   - Value: [Get from https://console.groq.com/keys]
+5. Deploy
 
-## Free Tier Limits
-- 1,000,000 tokens/minute
-- 1,000,000 tokens/day
-- Perfect for price estimations!
+## Free Tier
+- 1,000,000 tokens/min (free!)
+- Estimates any item price instantly
 
-## What it does
-Estimates prices for ANY item:
-- "vintage Rolex" → AI estimates ~$15,000
-- "1 hour coding" → AI estimates ~$100
-- "Tesla Model 3" → AI estimates ~$45,000
-- "pizza in NYC" → AI estimates ~$18
+## Without AI
+Unknown items default to $100
