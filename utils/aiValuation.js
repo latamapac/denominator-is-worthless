@@ -809,3 +809,125 @@ module.exports = {
     generateItemImage
 };
 // Mon Feb 16 06:58:13 -03 2026
+
+// Additional items for knowledge base - Add to existing object
+// FOOD & DRINKS
+knowledgeBase['burger'] = { value: 12, type: 'food', scarcity: 2, utility: 70, desc: 'restaurant burger' };
+knowledgeBase['sushi'] = { value: 40, type: 'food', scarcity: 15, utility: 75, desc: 'sushi dinner' };
+knowledgeBase['steak'] = { value: 35, type: 'food', scarcity: 12, utility: 78, desc: 'restaurant steak' };
+knowledgeBase['sandwich'] = { value: 10, type: 'food', scarcity: 2, utility: 72, desc: 'deli sandwich' };
+knowledgeBase['salad'] = { value: 12, type: 'food', scarcity: 3, utility: 75, desc: 'fresh salad' };
+knowledgeBase['ramen'] = { value: 15, type: 'food', scarcity: 8, utility: 78, desc: 'bowl of ramen' };
+knowledgeBase['taco'] = { value: 4, type: 'food', scarcity: 2, utility: 70, desc: 'street taco' };
+knowledgeBase['burrito'] = { value: 10, type: 'food', scarcity: 3, utility: 75, desc: 'mission burrito' };
+knowledgeBase['soup'] = { value: 8, type: 'food', scarcity: 2, utility: 70, desc: 'bowl of soup' };
+knowledgeBase['pasta'] = { value: 18, type: 'food', scarcity: 4, utility: 76, desc: 'pasta dish' };
+knowledgeBase['smoothie'] = { value: 8, type: 'food', scarcity: 3, utility: 70, desc: 'fruit smoothie' };
+knowledgeBase['ice cream'] = { value: 6, type: 'food', scarcity: 2, utility: 65, desc: 'ice cream cone' };
+knowledgeBase['cake'] = { value: 40, type: 'food', scarcity: 10, utility: 60, desc: 'whole cake' };
+knowledgeBase['donut'] = { value: 3, type: 'food', scarcity: 1, utility: 55, desc: 'fancy donut' };
+knowledgeBase['croissant'] = { value: 4, type: 'food', scarcity: 3, utility: 65, desc: 'bakery croissant' };
+
+// SUBSCRIPTIONS & SERVICES
+knowledgeBase['netflix'] = { value: 15, type: 'service', scarcity: 1, utility: 85, desc: 'monthly subscription' };
+knowledgeBase['spotify'] = { value: 11, type: 'service', scarcity: 1, utility: 90, desc: 'monthly premium' };
+knowledgeBase['disney plus'] = { value: 14, type: 'service', scarcity: 1, utility: 80, desc: 'monthly streaming' };
+knowledgeBase['hbo max'] = { value: 16, type: 'service', scarcity: 1, utility: 82, desc: 'monthly streaming' };
+knowledgeBase['hulu'] = { value: 15, type: 'service', scarcity: 1, utility: 78, desc: 'monthly streaming' };
+knowledgeBase['youtube premium'] = { value: 14, type: 'service', scarcity: 1, utility: 85, desc: 'monthly no ads' };
+knowledgeBase['amazon prime'] = { value: 15, type: 'service', scarcity: 2, utility: 88, desc: 'monthly membership' };
+knowledgeBase['gym membership'] = { value: 50, type: 'service', scarcity: 5, utility: 80, desc: 'monthly gym' };
+knowledgeBase['uber eats pass'] = { value: 10, type: 'service', scarcity: 3, utility: 75, desc: 'monthly delivery' };
+knowledgeBase['chatgpt plus'] = { value: 20, type: 'service', scarcity: 5, utility: 90, desc: 'monthly AI access' };
+
+// EXPERIENCES
+knowledgeBase['movie ticket'] = { value: 15, type: 'experience', scarcity: 5, utility: 75, desc: 'cinema ticket' };
+knowledgeBase['concert ticket'] = { value: 120, type: 'experience', scarcity: 40, utility: 85, desc: 'live concert' };
+knowledgeBase['sporting event'] = { value: 150, type: 'experience', scarcity: 45, utility: 80, desc: 'game ticket' };
+knowledgeBase['museum ticket'] = { value: 25, type: 'experience', scarcity: 10, utility: 70, desc: 'museum entry' };
+knowledgeBase['amusement park'] = { value: 80, type: 'experience', scarcity: 20, utility: 85, desc: 'theme park day' };
+knowledgeBase['zoo ticket'] = { value: 30, type: 'experience', scarcity: 15, utility: 75, desc: 'zoo admission' };
+knowledgeBase['aquarium ticket'] = { value: 35, type: 'experience', scarcity: 18, utility: 75, desc: 'aquarium entry' };
+knowledgeBase['spa day'] = { value: 200, type: 'experience', scarcity: 30, utility: 70, desc: 'full spa day' };
+knowledgeBase['massage'] = { value: 80, type: 'experience', scarcity: 25, utility: 75, desc: '60min massage' };
+knowledgeBase['haircut'] = { value: 40, type: 'experience', scarcity: 10, utility: 80, desc: 'salon haircut' };
+knowledgeBase['manicure'] = { value: 35, type: 'experience', scarcity: 8, utility: 65, desc: 'nail service' };
+knowledgeBase['tattoo'] = { value: 200, type: 'experience', scarcity: 45, utility: 60, desc: 'hourly rate' };
+
+// HOME & GARDEN
+knowledgeBase['plant'] = { value: 25, type: 'home', scarcity: 8, utility: 50, desc: 'houseplant' };
+knowledgeBase['succulent'] = { value: 10, type: 'home', scarcity: 5, utility: 45, desc: 'small plant' };
+knowledgeBase['candle'] = { value: 20, type: 'home', scarcity: 6, utility: 40, desc: 'scented candle' };
+knowledgeBase['pillow'] = { value: 30, type: 'home', scarcity: 8, utility: 70, desc: 'decorative pillow' };
+knowledgeBase['blanket'] = { value: 50, type: 'home', scarcity: 10, utility: 80, desc: 'throw blanket' };
+knowledgeBase['curtains'] = { value: 80, type: 'home', scarcity: 12, utility: 65, desc: 'window curtains' };
+knowledgeBase['clock'] = { value: 30, type: 'home', scarcity: 8, utility: 60, desc: 'wall clock' };
+knowledgeBase['vase'] = { value: 35, type: 'home', scarcity: 10, utility: 35, desc: 'decorative vase' };
+knowledgeBase['picture frame'] = { value: 20, type: 'home', scarcity: 6, utility: 40, desc: 'photo frame' };
+knowledgeBase['doormat'] = { value: 25, type: 'home', scarcity: 5, utility: 50, desc: 'welcome mat' };
+knowledgeBase['toolbox'] = { value: 60, type: 'home', scarcity: 12, utility: 75, desc: 'basic tools' };
+
+// SPORTS EQUIPMENT
+knowledgeBase['basketball'] = { value: 30, type: 'sports', scarcity: 8, utility: 70, desc: 'indoor/outdoor ball' };
+knowledgeBase['football'] = { value: 25, type: 'sports', scarcity: 8, utility: 70, desc: 'american football' };
+knowledgeBase['soccer ball'] = { value: 25, type: 'sports', scarcity: 8, utility: 75, desc: 'futbol' };
+knowledgeBase['tennis racket'] = { value: 80, type: 'sports', scarcity: 20, utility: 70, desc: 'quality racket' };
+knowledgeBase['golf club'] = { value: 150, type: 'sports', scarcity: 30, utility: 60, desc: 'driver/iron' };
+knowledgeBase['yoga mat'] = { value: 30, type: 'sports', scarcity: 10, utility: 80, desc: 'exercise mat' };
+knowledgeBase['dumbbell'] = { value: 50, type: 'sports', scarcity: 12, utility: 85, desc: 'pair weights' };
+knowledgeBase['kettlebell'] = { value: 60, type: 'sports', scarcity: 15, utility: 80, desc: 'cast iron' };
+knowledgeBase['resistance bands'] = { value: 25, type: 'sports', scarcity: 8, utility: 75, desc: 'exercise bands' };
+knowledgeBase['jump rope'] = { value: 15, type: 'sports', scarcity: 5, utility: 70, desc: 'speed rope' };
+knowledgeBase['boxing gloves'] = { value: 50, type: 'sports', scarcity: 15, utility: 70, desc: 'training gloves' };
+knowledgeBase['skateboard'] = { value: 70, type: 'sports', scarcity: 18, utility: 75, desc: 'complete board' };
+knowledgeBase['rollerblades'] = { value: 100, type: 'sports', scarcity: 22, utility: 70, desc: 'inline skates' };
+knowledgeBase['snowboard'] = { value: 350, type: 'sports', scarcity: 35, utility: 60, desc: 'with bindings' };
+knowledgeBase['ski boots'] = { value: 300, type: 'sports', scarcity: 30, utility: 65, desc: 'alpine boots' };
+
+// BOOKS & MEDIA
+knowledgeBase['hardcover book'] = { value: 28, type: 'media', scarcity: 8, utility: 65, desc: 'new release' };
+knowledgeBase['paperback book'] = { value: 16, type: 'media', scarcity: 5, utility: 65, desc: 'fiction novel' };
+knowledgeBase['textbook'] = { value: 150, type: 'media', scarcity: 30, utility: 85, desc: 'college textbook' };
+knowledgeBase['comic book'] = { value: 5, type: 'media', scarcity: 10, utility: 55, desc: 'single issue' };
+knowledgeBase['manga'] = { value: 12, type: 'media', scarcity: 12, utility: 60, desc: 'volume' };
+knowledgeBase['graphic novel'] = { value: 25, type: 'media', scarcity: 15, utility: 60, desc: 'collected edition' };
+knowledgeBase['vinyl record'] = { value: 30, type: 'media', scarcity: 25, utility: 50, desc: 'LP album' };
+knowledgeBase['cd'] = { value: 15, type: 'media', scarcity: 12, utility: 45, desc: 'music album' };
+knowledgeBase['dvd'] = { value: 15, type: 'media', scarcity: 10, utility: 40, desc: 'movie disc' };
+knowledgeBase['blu-ray'] = { value: 25, type: 'media', scarcity: 15, utility: 45, desc: 'hd movie' };
+knowledgeBase['board game'] = { value: 40, type: 'media', scarcity: 18, utility: 75, desc: 'strategy game' };
+knowledgeBase['puzzle'] = { value: 20, type: 'media', scarcity: 10, utility: 60, desc: '1000 pieces' };
+knowledgeBase['playing cards'] = { value: 8, type: 'media', scarcity: 3, utility: 70, desc: 'quality deck' };
+
+// MUSICAL INSTRUMENTS
+knowledgeBase['guitar'] = { value: 300, type: 'music', scarcity: 25, utility: 70, desc: 'acoustic guitar' };
+knowledgeBase['electric guitar'] = { value: 500, type: 'music', scarcity: 35, utility: 70, desc: 'solid body' };
+knowledgeBase['bass guitar'] = { value: 400, type: 'music', scarcity: 30, utility: 65, desc: '4-string' };
+knowledgeBase['ukulele'] = { value: 60, type: 'music', scarcity: 15, utility: 70, desc: 'soprano uke' };
+knowledgeBase['keyboard'] = { value: 200, type: 'music', scarcity: 18, utility: 75, desc: '61-key' };
+knowledgeBase['digital piano'] = { value: 600, type: 'music', scarcity: 30, utility: 80, desc: 'weighted keys' };
+knowledgeBase['drum set'] = { value: 500, type: 'music', scarcity: 35, utility: 65, desc: '5-piece kit' };
+knowledgeBase['microphone'] = { value: 100, type: 'music', scarcity: 15, utility: 75, desc: 'dynamic mic' };
+knowledgeBase['headphones'] = { value: 150, type: 'music', scarcity: 18, utility: 85, desc: 'studio monitors' };
+
+// BABY & KIDS
+knowledgeBase['stroller'] = { value: 300, type: 'baby', scarcity: 20, utility: 90, desc: 'baby stroller' };
+knowledgeBase['carseat'] = { value: 200, type: 'baby', scarcity: 18, utility: 95, desc: 'safety seat' };
+knowledgeBase['crib'] = { value: 400, type: 'baby', scarcity: 25, utility: 95, desc: 'baby crib' };
+knowledgeBase['diapers'] = { value: 40, type: 'baby', scarcity: 5, utility: 98, desc: 'month supply' };
+knowledgeBase['baby formula'] = { value: 35, type: 'baby', scarcity: 6, utility: 95, desc: 'month supply' };
+knowledgeBase['stuffed animal'] = { value: 25, type: 'baby', scarcity: 8, utility: 60, desc: 'plush toy' };
+knowledgeBase['lego set'] = { value: 60, type: 'baby', scarcity: 20, utility: 85, desc: 'building set' };
+knowledgeBase['doll'] = { value: 30, type: 'baby', scarcity: 10, utility: 55, desc: 'fashion doll' };
+knowledgeBase['nintendo switch'] = { value: 300, type: 'baby', scarcity: 30, utility: 85, desc: 'console' };
+
+// PETS
+knowledgeBase['dog food'] = { value: 60, type: 'pet', scarcity: 8, utility: 95, desc: 'month supply' };
+knowledgeBase['cat food'] = { value: 40, type: 'pet', scarcity: 6, utility: 95, desc: 'month supply' };
+knowledgeBase['dog bed'] = { value: 50, type: 'pet', scarcity: 12, utility: 75, desc: 'pet bed' };
+knowledgeBase['cat tree'] = { value: 80, type: 'pet', scarcity: 18, utility: 70, desc: 'climbing tower' };
+knowledgeBase['fish tank'] = { value: 100, type: 'pet', scarcity: 20, utility: 60, desc: '10 gallon setup' };
+knowledgeBase['bird cage'] = { value: 80, type: 'pet', scarcity: 18, utility: 65, desc: 'medium cage' };
+knowledgeBase['hamster cage'] = { value: 50, type: 'pet', scarcity: 12, utility: 60, desc: 'complete setup' };
+knowledgeBase['dog leash'] = { value: 20, type: 'pet', scarcity: 6, utility: 80, desc: 'quality leash' };
+knowledgeBase['pet carrier'] = { value: 40, type: 'pet', scarcity: 10, utility: 75, desc: 'travel carrier' };
