@@ -279,6 +279,7 @@
             .result-amount { font-size: 2.5rem; }
         }
     </style>
+    <link rel="stylesheet" href="/css/improvements.css">
 </head>
 <body>
     <div class="bg-grid"></div>
@@ -292,10 +293,13 @@
         </header>
 
         <main class="calculator">
+            <!-- Error Message -->
+            <div id="errorMessage" class="error-message"></div>
+
             <div class="exchange-container">
                 <div class="item-side have-side">
                     <div class="side-label">▼ YOU HAVE</div>
-                    <input type="text" id="haveItem" class="item-input" placeholder="e.g., 1 Bitcoin">
+                    <input type="text" id="haveItem" class="item-input" placeholder="e.g., 1 Bitcoin in USA">
                     <input type="number" id="haveAmount" class="amount-input" value="1" min="0.01">
                 </div>
 
@@ -309,9 +313,15 @@
 
                 <div class="item-side want-side">
                     <div class="side-label">▲ YOU WANT</div>
-                    <input type="text" id="wantItem" class="item-input" placeholder="e.g., vintage cars">
+                    <input type="text" id="wantItem" class="item-input" placeholder="e.g., Tesla Model 3">
                     <input type="text" id="wantAmount" class="amount-input" placeholder="?" readonly style="color: var(--primary); font-size: 1.5rem;">
                 </div>
+            </div>
+
+            <!-- Action Buttons -->
+            <div class="action-buttons">
+                <button class="action-btn swap-btn" onclick="swapItems()">⇄ Swap</button>
+                <button class="action-btn" onclick="clearInputs()">✕ Clear</button>
             </div>
 
             <button id="calculateBtn" class="calculate-btn">⚡ CALCULATE EXCHANGE</button>
@@ -340,7 +350,16 @@
                         <div id="sentimentValue" class="factor-value">67%</div>
                     </div>
                 </div>
+                
+                <!-- Result Actions -->
+                <div class="result-actions">
+                    <button id="copyBtn" class="result-btn" onclick="copyResult()">📋 Copy</button>
+                    <button class="result-btn" onclick="generateShareUrl()">🔗 Share</button>
+                </div>
             </div>
+            
+            <!-- Recent Trades -->
+            <div id="recentTrades" class="recent-trades"></div>
         </main>
 
         <section class="examples">
@@ -381,9 +400,8 @@
             const wantItem = document.getElementById('wantItem').value.trim();
             const haveAmount = parseFloat(document.getElementById('haveAmount').value) || 1;
 
-            if (!haveItem || !wantItem) {
-                return;
-            }
+            // Validation
+            if (!validateInputs(haveItem, wantItem)) return;
 
             console.log('Calculating:', haveItem, '->', wantItem);
             
@@ -437,6 +455,10 @@
             
             const resultPanel = document.getElementById('resultPanel');
             resultPanel.style.display = 'block';
+            
+            // Save to recent trades
+            saveRecentTrade(data.haveItem, data.wantItem, amount);
+            
             console.log('Result panel displayed');
         }
 
@@ -457,5 +479,6 @@
                 .catch(e => console.error('Health check failed:', e));
         }, 1000);
     </script>
+    <script src="/js/improvements.js"></script>
 </body>
 </html>
