@@ -607,17 +607,20 @@ async function getItemData(item) {
     console.log(`[getItemData] No real price from APIs for: ${item}`);
     
     // PRIORITY 2: Check knowledge base (accurate static prices)
+    // Sort keys by length (longest first) to avoid partial matches like "car" in "charizard"
     let kbMatch = null;
+    let bestMatchLength = 0;
+    
     for (const [key, data] of Object.entries(knowledgeBase)) {
-        if (itemLower.includes(key)) {
+        if (itemLower.includes(key) && key.length > bestMatchLength) {
             kbMatch = { ...data, name: key, realPrice: false };
-            break;
+            bestMatchLength = key.length;
         }
     }
     
     // If knowledge base match found, use it (good static data)
     if (kbMatch) {
-        console.log(`[getItemData] Using knowledge base for "${item}": $${kbMatch.value}`);
+        console.log(`[getItemData] Using knowledge base for "${item}": $${kbMatch.value} (matched: "${kbMatch.name}")`);
         return kbMatch;
     }
     
